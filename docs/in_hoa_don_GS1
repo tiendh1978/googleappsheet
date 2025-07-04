@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>HÓA ĐƠN BÁN HÀNG</title>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <style>
+        /* Giữ nguyên phần CSS như trước */
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <!-- Giữ nguyên cấu trúc HTML -->
+        <div id="loading">Đang tải dữ liệu từ Google Sheets...</div>
+    </div>
+
+    <script>
+        // 1. Khai báo thông tin Google Sheets
+        const SPREADSHEET_ID = '1lfhStC2HafYHYiHSI-odRtsA1TanLN7CF6aXY4yGoxY'; // Thay bằng ID file Google Sheets
+        const SHEET_NAME = 'Đơn hàng'; // Thay bằng tên sheet
+        const DETAIL_SHEET = 'ĐH chi tiết'; // Sheet chi tiết đơn hàng
+
+        // 2. Hàm lấy dữ liệu từ Google Sheets API
+        async function loadData(orderId) {
+            try {
+                // Khởi tạo Google API Client
+                await new Promise((resolve) => gapi.load('client', resolve));
+                await gapi.client.init({
+                    apiKey: 'AIzaSyCwcyt396-pC8dBcTqoCT4CveFlJ427HXg', // Tạo API key trong Google Cloud Console
+                    discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
+                });
+
+                // Lấy dữ liệu đơn hàng chính
+                const mainData = await gapi.client.sheets.spreadsheets.values.get({
+                    spreadsheetId: SPREADSHEET_ID,
+                    range: `${SHEET_NAME}!A:Z`,
+                });
+
+                // Lấy dữ liệu chi tiết đơn hàng
+                const detailData = await gapi.client.sheets.spreadsheets.values.get({
+                    spreadsheetId: SPREADSHEET_ID,
+                    range: `${DETAIL_SHEET}!A:Z`,
+                });
+
+                // Xử lý dữ liệu và hiển thị
+                processData(mainData.result.values, detailData.result.values, orderId);
+                
+            } catch (error) {
+                console.error('Lỗi khi tải dữ liệu:', error);
+                document.getElementById('loading').textContent = 'Lỗi khi tải dữ liệu';
+            }
+        }
+
+        // 3. Hàm xử lý dữ liệu
+        function processData(mainData, detailData, orderId) {
+            // Tìm đơn hàng theo ID
+            const headerRow = mainData[0]; // Dòng tiêu đề
+            const orderRow = mainData.find(row => row[headerRow.indexOf('MÃ ĐƠN HÀNG')] === orderId);
+            
+            if (!orderRow) {
+                document.getElementById('loading').textContent = 'Không tìm thấy đơn hàng';
+                return;
+            }
+
+            // Điền thông tin chính
+            document.getElementById('order-code').textContent = orderRow[headerRow.indexOf('MÃ ĐƠN HÀNG')];
+            // ... điền các trường khác
+
+            // Lọc chi tiết đơn hàng
+            const detailHeader = detailData[0];
+            const orderDetails = detailData.filter(
+                row => row[detailHeader.indexOf('MÃ ĐƠN HÀNG')] === orderId
+            );
+
+            // Hiển thị chi tiết
+            const tbody = document.getElementById('product-body');
+            orderDetails.forEach((detail, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${detail[detailHeader.indexOf('MÃ SP')] || ''}</td>
+                    <!-- Thêm các cột khác -->
+                `;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // 4. Lấy orderId từ URL và tải dữ liệu
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('id');
+        
+        if (orderId) {
+            loadData(orderId);
+        } else {
+            document.getElementById('loading').textContent = 'Thiếu ID đơn hàng';
+        }
+    </script>
+</body>
+</html>
