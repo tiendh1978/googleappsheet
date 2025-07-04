@@ -1,0 +1,52 @@
+// Hàm lấy tham số URL
+function getUrlParam(name) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(name);
+}
+
+// Hàm điền dữ liệu
+function fillInvoiceData() {
+  const dataParam = getUrlParam('data');
+  if (!dataParam) return;
+  
+  try {
+    const data = JSON.parse(decodeURIComponent(dataParam));
+    
+    // Điền thông tin header
+    const header = data.header;
+    document.getElementById('order-code').textContent = header.Ma_don_hang;
+    document.getElementById('order-date').textContent = header.Ngay;
+    document.getElementById('phone').textContent = header.Dien_thoai;
+    document.getElementById('customer-name').textContent = header.Ten_khach_hang;
+    document.getElementById('address-note').textContent = header.Luu_y;
+    
+    // Điền sản phẩm
+    const tbody = document.getElementById('product-body');
+    tbody.innerHTML = '';
+    
+    data.products.forEach((product, index) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${product["MÃ SP"] || ''}</td>
+        <td>${product["TÊN SP"] || ''}</td>
+        <td>${product["SL BÁN"] || ''}</td>
+        <td>${product["ĐVT"] || ''}</td>
+        <td>${product["ĐƠN GIÁ"] ? formatCurrency(product["ĐƠN GIÁ"]) : ''}</td>
+        <td>${product["THÀNH TIỀN"] ? formatCurrency(product["THÀNH TIỀN"]) : ''}</td>
+      `;
+      tbody.appendChild(row);
+    });
+    
+  } catch (e) {
+    console.error('Lỗi xử lý dữ liệu:', e);
+  }
+}
+
+// Hàm định dạng tiền tệ
+function formatCurrency(num) {
+  return new Intl.NumberFormat('vi-VN').format(num);
+}
+
+// Chạy khi trang tải xong
+document.addEventListener('DOMContentLoaded', fillInvoiceData);
