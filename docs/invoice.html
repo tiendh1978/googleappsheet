@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HÓA ĐƠN BÁN HÀNG</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+        .invoice-container {
+            width: 210mm; /* Khổ A5 ngang */
+            height: 148mm;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 15px;
+            position: relative;
+        }
+        .header-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: start;
+        }
+        .bank-info {
+            padding: 8px;
+            border: 1px solid #ccc;
+            font-size: 12px;
+            line-height: 1.3;
+            background-color: #f9f9f9;
+        }
+        .company-info {
+            text-align: center;
+            padding: 0 5px;
+        }
+        .qr-placeholder {
+            border: 1px dashed #999;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9f9f9;
+            text-align: center;
+            padding: 5px;
+            font-size: 10px;
+        }
+        .company-name {
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+        .company-subtitle {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .company-phone {
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .invoice-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 10px 0;
+            padding: 6px 0;
+            border-top: 2px solid #333;
+            border-bottom: 2px solid #333;
+        }
+        .customer-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 12px;
+        }
+        .customer-info {
+            padding: 6px;
+            border: 1px solid #ddd;
+            min-height: 45px;
+        }
+        .customer-double {
+            grid-column: span 2;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .info-label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 2px;
+            font-size: 11px;
+        }
+        .info-value {
+            font-size: 12px;
+            min-height: 16px;
+        }
+        .section-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin: 10px 0 5px;
+            padding: 3px 0;
+            border-bottom: 1px solid #333;
+        }
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            table-layout: fixed;
+            font-size: 11px;
+        }
+        .product-table th {
+            background-color: #f2f2f2;
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .product-table td {
+            border: 1px solid #ddd;
+            padding: 5px;
+            text-align: center;
+            height: 30px;
+            word-wrap: break-word;
+        }
+        .footer-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .notes {
+            font-size: 11px;
+            line-height: 1.4;
+            padding: 8px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+        .notes p {
+            margin: 5px 0;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #d9534f;
+        }
+        .signature-area {
+            text-align: center;
+            font-style: italic;
+            font-size: 12px;
+            padding-top: 30px;
+        }
+        .signature-line {
+            width: 150px;
+            border-top: 1px solid #000;
+            margin: 40px auto 5px;
+            padding: 0;
+        }
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+                margin: 0;
+            }
+            .invoice-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 10px;
+                width: 100%;
+                height: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <!-- Bank Info -->
+            <div class="bank-info">
+                <strong>TÀI KHOẢN NGÂN HÀNG</strong><br>
+                Tên TK: BÙI THUÝ VÂN<br>
+                Số TK: 19036542358012<br>
+                Ngân hàng: TECHCOMBANK
+            </div>
+            
+            <!-- Company Info -->
+            <div class="company-info">
+                <div class="company-name">CÔNG TY TNHH TRUNG KHẢI</div>
+                <div class="company-subtitle">TỔNG ĐẠI LÝ PHÂN PHỐI NƯỚC</div>
+                <div class="company-phone">ĐIỆN THOẠI: 0334 35 3993  0971 60 1771</div>
+            </div>
+            
+            <!-- QR Code Placeholder -->
+            <div class="qr-placeholder">
+                [QR CODE THANH TOÁN]<br>
+                (Chỗ này sẽ hiển thị mã QR động)
+            </div>
+        </div>
+        
+        <!-- Invoice Title -->
+        <div class="invoice-title">HOÁ ĐƠN BÁN HÀNG</div>
+        
+        <!-- Customer Information -->
+        <div class="customer-section">
+            <div class="customer-info">
+                <span class="info-label">Mã đơn hàng</span>
+                <div class="info-value" id="order-code"></div>
+            </div>
+            
+            <div class="customer-info">
+                <span class="info-label">Ngày</span>
+                <div class="info-value" id="order-date"></div>
+            </div>
+            
+            <div class="customer-double">
+                <div class="customer-info">
+                    <span class="info-label">Tên khách hàng</span>
+                    <div class="info-value" id="customer-name"></div>
+                </div>
+                
+                <div class="customer-info">
+                    <span class="info-label">Lưu ý địa chỉ</span>
+                    <div class="info-value" id="address-note"></div>
+                </div>
+            </div>
+            
+            <div class="customer-info">
+                <span class="info-label">Số điện thoại</span>
+                <div class="info-value" id="phone"></div>
+            </div>
+        </div>
+        
+        <!-- Order Details -->
+        <div class="section-title">B. ĐƠN HÀNG CHI TIẾT</div>
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th style="width: 5%">STT</th>
+                    <th style="width: 15%">Mã SP</th>
+                    <th style="width: 25%">Tên sản phẩm</th>
+                    <th style="width: 10%">SL</th>
+                    <th style="width: 10%">DVT</th>
+                    <th style="width: 15%">Đơn giá</th>
+                    <th style="width: 20%">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody id="product-body">
+                <!-- Dữ liệu sản phẩm sẽ được thêm động ở đây -->
+            </tbody>
+        </table>
+        
+        <!-- Footer Section -->
+        <div class="footer-section">
+            <!-- Notes -->
+            <div class="notes">
+                <p><span class="highlight">Ghi chú:</span></p>
+                <p>- Đặt cọc 50,000 đ/vô</p>
+                <p>- Không lấy nước sẽ tính phí</p>
+                <p>- Phí bè: T2 (5k), T3 (10k), T4 (15k)/bình</p>
+                <p>- Hỗ trợ phí gửi xe (nếu có)</p>
+            </div>
+            
+            <!-- Signature -->
+            <div class="signature-area">
+                <p>Hà Nội, ngày <span id="current-day"></span> tháng <span id="current-month"></span> năm <span id="current-year"></span></p>
+                <div class="signature-line"></div>
+                <p>Người lập đơn</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hàm lấy tham số từ URL
+        function getUrlParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Điền dữ liệu vào hóa đơn
+        function fillInvoiceData() {
+            // Thông tin khách hàng
+            document.getElementById('order-code').textContent = getUrlParam('Ma_don_hang') || '';
+            document.getElementById('order-date').textContent = getUrlParam('Ngay') || '';
+            document.getElementById('phone').textContent = getUrlParam('Dien_thoai') || '';
+            document.getElementById('customer-name').textContent = getUrlParam('Ten_khach_hang') || '';
+            document.getElementById('address-note').textContent = getUrlParam('Luu_y_dia_chi') || '';
+            
+            // QR Code
+            const qrUrl = getUrlParam('QR_code');
+            if (qrUrl) {
+                document.querySelector('.qr-placeholder').innerHTML = `<img src="${qrUrl}" style="max-width:100%;max-height:90px;">`;
+            }
+            
+            // Điền sản phẩm
+            const productsJson = getUrlParam('products');
+            if (productsJson) {
+                try {
+                    const products = JSON.parse(decodeURIComponent(productsJson));
+                    const tbody = document.getElementById('product-body');
+                    tbody.innerHTML = '';
+                    
+                    products.forEach((product, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td>${product["Ma_SP"] || ''}</td>
+                            <td>${product["Ten_SP"] || ''}</td>
+                            <td>${product["SL_ban"] || ''}</td>
+                            <td>${product["DVT"] || ''}</td>
+                            <td>${product["Don_gia"] ? Number(product["Don_gia"]).toLocaleString() : ''}</td>
+                            <td>${product["Thanh_tien"] ? Number(product["Thanh_tien"]).toLocaleString() : ''}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } catch(e) {
+                    console.error('Error parsing products:', e);
+                }
+            }
+            
+            // Ngày hiện tại
+            const now = new Date();
+            document.getElementById('current-day').textContent = now.getDate();
+            document.getElementById('current-month').textContent = now.getMonth() + 1;
+            document.getElementById('current-year').textContent = now.getFullYear();
+        }
+
+        // Gọi hàm khi trang tải xong
+        document.addEventListener('DOMContentLoaded', fillInvoiceData);
+    </script>
+</body>
+</html>
