@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="version" content="2024-07-05-v3">
     <title>HÓA ĐƠN BÁN HÀNG - CÔNG TY TRUNG KHẢI</title>
     <style>
         * {
@@ -30,13 +31,132 @@
             margin: 0 auto;
         }
         
-        /* (Giữ nguyên các phần CSS khác như trước) */
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
         
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #0066cc;
+        }
+        
+        .invoice-title {
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .customer-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .info-box {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+        
+        .info-value {
+            font-size: 14px;
+        }
+        
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+        
+        .product-table th {
+            background-color: #0066cc;
+            color: white;
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        
+        .product-table td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: center;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            background-color: #f2f2f2;
+        }
+        
+        .notes {
+            margin-top: 20px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        .signature {
+            margin-top: 40px;
+            text-align: right;
+            font-style: italic;
+        }
+        
+        @media print {
+            body {
+                background: none;
+            }
+            .invoice-container {
+                box-shadow: none;
+                padding: 0;
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="invoice-container">
-        <!-- (Giữ nguyên phần HTML header và customer-info như trước) -->
+        <div class="header">
+            <div class="company-name">CÔNG TY TNHH TRUNG KHẢI</div>
+            <div style="font-weight: bold; margin: 5px 0;">TỔNG ĐẠI LÝ PHÂN PHỐI NƯỚC</div>
+            <div>ĐT: 0334 35 3993 - 0971 60 1771</div>
+        </div>
+        
+        <div class="invoice-title">HÓA ĐƠN BÁN HÀNG</div>
+        
+        <div class="customer-info">
+            <div class="info-box">
+                <div class="info-label">Mã đơn hàng</div>
+                <div class="info-value" id="order-code"></div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">Ngày</div>
+                <div class="info-value" id="order-date"></div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">Tên khách hàng</div>
+                <div class="info-value" id="customer-name"></div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">Điện thoại</div>
+                <div class="info-value" id="customer-phone"></div>
+            </div>
+            <div class="info-box" style="grid-column: span 2;">
+                <div class="info-label">Địa chỉ</div>
+                <div class="info-value" id="customer-address"></div>
+            </div>
+        </div>
         
         <table class="product-table">
             <thead>
@@ -61,10 +181,26 @@
             </tfoot>
         </table>
         
-        <!-- (Giữ nguyên phần notes và signature như trước) -->
+        <div class="notes">
+            <p><strong>Ghi chú:</strong></p>
+            <p>- Đặt cọc 50.000 đ/vô</p>
+            <p>- Không lấy nước sẽ tính phí</p>
+            <p>- Phí bè: T2 (5k), T3 (10k), T4 (15k)/bình</p>
+            <p>- Hỗ trợ phí gửi xe (nếu có)</p>
+        </div>
+        
+        <div class="signature">
+            <p>Hà Nội, ngày <span id="print-day"></span> tháng <span id="print-month"></span> năm <span id="print-year"></span></p>
+            <p style="margin-top: 30px;">Người lập đơn</p>
+            <p style="margin-top: 50px;"><strong>TRẦN TRUNG KHẢI</strong></p>
+        </div>
     </div>
 
     <script>
+        // Phiên bản template
+        const TEMPLATE_VERSION = "2024-07-05-v3";
+        console.log("Đang sử dụng template version:", TEMPLATE_VERSION);
+        
         // Hàm lấy tham số từ URL
         function getUrlParameter(name) {
             name = name.replace(/[\[\]]/g, '\\$&');
@@ -80,40 +216,52 @@
             return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
         }
 
-        // Hàm xử lý dữ liệu sản phẩm (phiên bản mới)
+        // Hàm xử lý dữ liệu sản phẩm (phiên bản đã sửa)
         function processProducts(productsStr) {
-            if (!productsStr) return [];
-            
-            // Tách toàn bộ các giá trị bằng "_a_" trước
-            const allValues = productsStr.split('_a_');
-            
-            // Mỗi sản phẩm có 6 thuộc tính nên số sản phẩm = tổng số giá trị / 6
-            const productCount = allValues.length / 6;
-            const products = [];
-            let totalAmount = 0;
-            
-            // Tách tiếp từng nhóm giá trị bằng "_b_" trong mỗi phần
-            const columns = [];
-            for (let i = 0; i < 6; i++) {
-                columns[i] = allValues[i].split('_b_');
+            if (!productsStr) {
+                console.error("Không có dữ liệu sản phẩm");
+                return [];
             }
             
-            // Tạo danh sách sản phẩm
-            for (let i = 0; i < productCount; i++) {
-                const product = {
-                    stt: i + 1,
-                    maSP: safeDecode(columns[0][i]),      // Mã SP
-                    tenSP: safeDecode(columns[1][i]),     // Tên SP
-                    slBan: columns[2][i] || '0',         // Số lượng
-                    dvt: safeDecode(columns[3][i]),      // Đơn vị tính
-                    donGia: parseNumber(columns[4][i]),  // Đơn giá
-                    thanhTien: parseNumber(columns[5][i]) // Thành tiền
-                };
-                products.push(product);
-                totalAmount += product.thanhTien;
-            }
+            console.log("Dữ liệu sản phẩm nhận được:", productsStr);
             
-            return { products, totalAmount };
+            try {
+                const productGroups = productsStr.split('_a_');
+                if (productGroups.length !== 6) {
+                    throw new Error("Sai cấu trúc dữ liệu sản phẩm");
+                }
+
+                const maSPs = productGroups[0].split('_b_');
+                const tenSPs = productGroups[1].split('_b_');
+                const slBans = productGroups[2].split('_b_');
+                const dvts = productGroups[3].split('_b_');
+                const donGias = productGroups[4].split('_b_');
+                const thanhTiens = productGroups[5].split('_b_');
+
+                const products = [];
+                let totalAmount = 0;
+
+                for (let i = 0; i < maSPs.length; i++) {
+                    const product = {
+                        stt: i + 1,
+                        maSP: safeDecode(maSPs[i]),
+                        tenSP: safeDecode(tenSPs[i]),
+                        slBan: slBans[i] || '0',
+                        dvt: safeDecode(dvts[i]),
+                        donGia: parseNumber(donGias[i]),
+                        thanhTien: parseNumber(thanhTiens[i])
+                    };
+                    products.push(product);
+                    totalAmount += product.thanhTien;
+                }
+
+                console.log("Đã xử lý thành công", products.length, "sản phẩm");
+                return { products, totalAmount };
+
+            } catch (error) {
+                console.error("Lỗi khi xử lý sản phẩm:", error);
+                return [];
+            }
         }
 
         // Hàm hỗ trợ decode an toàn
@@ -134,7 +282,9 @@
         // Hàm hiển thị dữ liệu
         function displayData() {
             try {
-                // Xử lý header (giữ nguyên như trước)
+                console.log("Bắt đầu xử lý hiển thị hóa đơn...");
+                
+                // Xử lý header
                 const headerParam = getUrlParameter('header');
                 if (headerParam) {
                     const header = JSON.parse(headerParam);
@@ -143,9 +293,11 @@
                     document.getElementById('customer-name').textContent = header.TenKhachHang || '';
                     document.getElementById('customer-phone').textContent = header.DienThoai || '';
                     document.getElementById('customer-address').textContent = header.DiaChi || '';
+                    
+                    console.log("Đã xử lý xong thông tin header");
                 }
 
-                // Xử lý sản phẩm với logic mới
+                // Xử lý sản phẩm
                 const productsParam = getUrlParameter('products');
                 const tbody = document.getElementById('product-body');
                 tbody.innerHTML = '';
@@ -168,6 +320,7 @@
                     });
                     
                     document.getElementById('total-amount').textContent = formatCurrency(totalAmount);
+                    console.log("Đã hiển thị", products.length, "sản phẩm");
                 }
 
                 // Hiển thị ngày in
@@ -178,17 +331,23 @@
 
                 // Tự động in nếu có tham số ?print=true
                 if (getUrlParameter('print') === 'true') {
+                    console.log("Tự động in hóa đơn...");
                     window.print();
                 }
                 
+                console.log("Xử lý hóa đơn hoàn tất");
+                
             } catch (error) {
-                console.error('Error processing invoice data:', error);
+                console.error("Error processing invoice data:", error);
                 alert('Có lỗi khi tải hóa đơn. Vui lòng kiểm tra lại dữ liệu.');
             }
         }
 
         // Chạy khi trang tải xong
-        document.addEventListener('DOMContentLoaded', displayData);
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Trang đã tải xong, bắt đầu xử lý...");
+            displayData();
+        });
     </script>
 </body>
 </html>
