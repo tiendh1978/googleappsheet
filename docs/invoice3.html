@@ -9,217 +9,139 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            color: #333;
         }
-        .invoice-container {
-            max-width: 210mm;
+        .invoice-box {
+            max-width: 800px;
             margin: 0 auto;
-            padding: 15mm;
-            border: 1px solid #ddd;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            border: 1px solid #eee;
         }
         .header {
             text-align: center;
             margin-bottom: 20px;
-            border-bottom: 2px solid #0066cc;
-            padding-bottom: 10px;
         }
         .company-name {
             font-size: 24px;
             font-weight: bold;
             color: #0066cc;
-            text-transform: uppercase;
-        }
-        .invoice-title {
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-            margin: 15px 0;
-            color: #d9534f;
-        }
-        .customer-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .info-box {
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 4px;
-        }
-        .info-label {
-            font-weight: bold;
-            font-size: 14px;
-            margin-bottom: 5px;
-            color: #555;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
-            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
         }
         th {
             background-color: #0066cc;
             color: white;
-            padding: 10px;
-            text-align: center;
-        }
-        td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
         }
         .text-left {
             text-align: left;
         }
         .total-row {
             font-weight: bold;
-            background-color: #f8f9fa;
-        }
-        .notes {
-            margin-top: 25px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-            font-size: 13px;
+            background-color: #f2f2f2;
         }
         .signature {
             margin-top: 50px;
             text-align: right;
         }
-        @media print {
-            body {
-                padding: 0;
-                background: none;
-            }
-            .invoice-container {
-                border: none;
-                box-shadow: none;
-                padding: 0;
-                max-width: 100%;
-            }
-        }
     </style>
 </head>
 <body>
-    <div class="invoice-container">
-        <!-- Header -->
+    <div class="invoice-box">
         <div class="header">
             <div class="company-name">CÔNG TY TNHH TRUNG KHẢI</div>
-            <div style="font-weight: bold; margin: 5px 0;">TỔNG ĐẠI LÝ PHÂN PHỐI NƯỚC</div>
             <div>ĐT: 0334 35 3993 - 0971 60 1771</div>
         </div>
         
-        <!-- Invoice Title -->
-        <div class="invoice-title">HÓA ĐƠN BÁN HÀNG</div>
+        <h2 style="text-align: center;">HÓA ĐƠN BÁN HÀNG</h2>
         
-        <!-- Customer Information -->
-        <div class="customer-info">
-            <div class="info-box">
-                <div class="info-label">Mã đơn hàng</div>
-                <div id="order-code">-</div>
-            </div>
-            <div class="info-box">
-                <div class="info-label">Ngày</div>
-                <div id="order-date">-</div>
-            </div>
-            <div class="info-box">
-                <div class="info-label">Tên khách hàng</div>
-                <div id="customer-name">-</div>
-            </div>
-            <div class="info-box">
-                <div class="info-label">Điện thoại</div>
-                <div id="customer-phone">-</div>
-            </div>
-            <div class="info-box" style="grid-column: span 2;">
-                <div class="info-label">Địa chỉ giao hàng</div>
-                <div id="customer-address">-</div>
-            </div>
+        <div style="margin-bottom: 15px;">
+            <strong>Mã đơn:</strong> <span id="order-code"></span> | 
+            <strong>Ngày:</strong> <span id="order-date"></span>
         </div>
         
-        <!-- Products Table -->
+        <div style="margin-bottom: 15px;">
+            <strong>Khách hàng:</strong> <span id="customer-name"></span> | 
+            <strong>Điện thoại:</strong> <span id="customer-phone"></span>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <strong>Địa chỉ:</strong> <span id="customer-address"></span>
+        </div>
+        
         <table>
             <thead>
                 <tr>
-                    <th width="5%">STT</th>
-                    <th width="15%">Mã SP</th>
-                    <th width="30%">Tên sản phẩm</th>
-                    <th width="10%">SL</th>
-                    <th width="10%">ĐVT</th>
-                    <th width="15%">Đơn giá</th>
-                    <th width="15%">Thành tiền</th>
+                    <th>STT</th>
+                    <th>Mã SP</th>
+                    <th>Tên SP</th>
+                    <th>SL</th>
+                    <th>ĐVT</th>
+                    <th>Đơn giá</th>
+                    <th>Thành tiền</th>
                 </tr>
             </thead>
-            <tbody id="product-body">
-                <!-- Products will be inserted here by JavaScript -->
-            </tbody>
+            <tbody id="product-body"></tbody>
             <tfoot>
                 <tr class="total-row">
-                    <td colspan="6" style="text-align: right;">TỔNG CỘNG:</td>
-                    <td id="total-amount" style="text-align: center;">0đ</td>
+                    <td colspan="6">TỔNG CỘNG</td>
+                    <td id="total-amount"></td>
                 </tr>
             </tfoot>
         </table>
         
-        <!-- Notes -->
-        <div class="notes">
-            <p><strong>Ghi chú:</strong></p>
-            <p>- Đặt cọc 50.000 đ/vô</p>
-            <p>- Không lấy nước sẽ tính phí</p>
-            <p>- Phí bè: T2 (5k), T3 (10k), T4 (15k)/bình</p>
-            <p>- Hỗ trợ phí gửi xe (nếu có)</p>
-        </div>
-        
-        <!-- Signature -->
         <div class="signature">
-            <p>Hà Nội, ngày <span id="print-day"></span> tháng <span id="print-month"></span> năm <span id="print-year"></span></p>
-            <p style="margin-top: 30px;">Người lập đơn</p>
-            <p style="margin-top: 50px;"><strong>TRẦN TRUNG KHẢI</strong></p>
+            <div>Hà Nội, ngày <span id="current-date"></span></div>
+            <div style="margin-top: 30px;">Người lập đơn</div>
+            <div><strong>TRẦN TRUNG KHẢI</strong></div>
         </div>
     </div>
 
     <script>
-        // Hàm lấy tham số từ URL
+        // Hàm lấy tham số URL
         function getUrlParam(name) {
-            const params = new URLSearchParams(window.location.search);
-            return params.get(name);
+            const url = new URL(window.location.href);
+            return url.searchParams.get(name);
         }
 
-        // Hàm định dạng tiền tệ
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
+        // Hàm định dạng tiền
+        function formatMoney(num) {
+            return new Intl.NumberFormat('vi-VN').format(num) + 'đ';
         }
 
         // Hàm xử lý dữ liệu sản phẩm
-        function processProducts(productsStr) {
-            if (!productsStr) return { products: [], total: 0 };
+        function parseProducts(productsParam) {
+            if (!productsParam) return [];
             
+            const decoded = decodeURIComponent(productsParam);
             const products = [];
             let total = 0;
             
-            // Tách các sản phẩm
-            const productRows = decodeURIComponent(productsStr).split('_b_');
+            // Xử lý từng sản phẩm (phân cách bằng dấu phẩy)
+            const productGroups = decoded.split(', ');
             
-            productRows.forEach((row, index) => {
-                if (!row.trim()) return;
-                
-                const cols = row.split('_a_');
-                if (cols.length >= 7) {
-                    const product = {
-                        stt: index + 1,
-                        maDonHang: cols[0] || '',
-                        maSP: cols[1] || '',
-                        tenSP: cols[2] || '',
-                        slBan: cols[3] || '0',
-                        dvt: cols[4] || '',
-                        donGia: parseFloat(cols[5]) || 0,
-                        thanhTien: parseFloat(cols[6]) || 0
-                    };
+            productGroups.forEach((group, index) => {
+                const parts = group.split('_a_');
+                if (parts.length >= 7) {
+                    const price = parseFloat(parts[5]) || 0;
+                    const amount = parseFloat(parts[6]) || 0;
+                    total += amount;
                     
-                    products.push(product);
-                    total += product.thanhTien;
+                    products.push({
+                        stt: index + 1,
+                        maSP: parts[1] || '',
+                        tenSP: parts[2] || '',
+                        slBan: parts[3] || '',
+                        dvt: parts[4] || '',
+                        donGia: price,
+                        thanhTien: amount
+                    });
                 }
             });
             
@@ -227,58 +149,54 @@
         }
 
         // Hàm hiển thị dữ liệu
-        function displayData() {
+        function loadData() {
             try {
-                // Xử lý header
-                const headerParam = getUrlParam('header');
-                if (headerParam) {
-                    const header = JSON.parse(decodeURIComponent(headerParam));
-                    document.getElementById('order-code').textContent = header.MaDonHang || '';
-                    document.getElementById('order-date').textContent = header.Ngay || '';
-                    document.getElementById('customer-name').textContent = header.TenKhachHang || '';
-                    document.getElementById('customer-phone').textContent = header.DienThoai || '';
-                    document.getElementById('customer-address').textContent = header.DiaChi || '';
-                }
-
-                // Xử lý sản phẩm
+                // Header
+                const header = JSON.parse(decodeURIComponent(getUrlParam('header') || '{}');
+                document.getElementById('order-code').textContent = header.MaDonHang || '';
+                document.getElementById('order-date').textContent = header.Ngay || '';
+                document.getElementById('customer-name').textContent = header.TenKhachHang || '';
+                document.getElementById('customer-phone').textContent = header.DienThoai || '';
+                document.getElementById('customer-address').textContent = header.DiaChi || '';
+                
+                // Products
                 const productsParam = getUrlParam('products');
                 const tbody = document.getElementById('product-body');
                 tbody.innerHTML = '';
                 
                 if (productsParam) {
-                    const { products, total } = processProducts(productsParam);
+                    const { products, total } = parseProducts(productsParam);
                     
                     products.forEach(product => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${product.stt}</td>
-                            <td>${product.maSP}</td>
-                            <td class="text-left">${product.tenSP}</td>
-                            <td>${product.slBan}</td>
-                            <td>${product.dvt}</td>
-                            <td>${formatCurrency(product.donGia)}</td>
-                            <td>${formatCurrency(product.thanhTien)}</td>
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${product.stt}</td>
+                                <td>${product.maSP}</td>
+                                <td class="text-left">${product.tenSP}</td>
+                                <td>${product.slBan}</td>
+                                <td>${product.dvt}</td>
+                                <td>${formatMoney(product.donGia)}</td>
+                                <td>${formatMoney(product.thanhTien)}</td>
+                            </tr>
                         `;
-                        tbody.appendChild(row);
                     });
                     
-                    document.getElementById('total-amount').textContent = formatCurrency(total);
+                    document.getElementById('total-amount').textContent = formatMoney(total);
                 }
-
-                // Hiển thị ngày in
+                
+                // Ngày hiện tại
                 const today = new Date();
-                document.getElementById('print-day').textContent = today.getDate();
-                document.getElementById('print-month').textContent = today.getMonth() + 1;
-                document.getElementById('print-year').textContent = today.getFullYear();
-
-            } catch (error) {
-                console.error('Error processing data:', error);
-                alert('Có lỗi khi tải hóa đơn. Vui lòng kiểm tra lại dữ liệu.');
+                document.getElementById('current-date').textContent = 
+                    `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+                
+            } catch (e) {
+                console.error('Error:', e);
+                alert('Có lỗi khi tải dữ liệu hóa đơn');
             }
         }
 
-        // Tự động chạy khi trang tải xong
-        document.addEventListener('DOMContentLoaded', displayData);
+        // Tự động chạy khi trang load
+        window.onload = loadData;
     </script>
 </body>
 </html>
