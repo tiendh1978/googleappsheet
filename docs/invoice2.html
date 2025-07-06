@@ -211,27 +211,29 @@
             return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
         }
 
-        // Hàm xử lý dữ liệu sản phẩm
+        // Hàm xử lý dữ liệu sản phẩm (đã điều chỉnh theo cấu trúc mới)
         function processProducts(productsStr) {
             if (!productsStr) return [];
             
-            const productRows = productsStr.split('_b_');
+            const productRows = productsStr.split('_b_').filter(row => row.trim() !== '');
             const products = [];
             let totalAmount = 0;
             
             productRows.forEach((row, index) => {
-                const [maDonHang, maSP, tenSP, slBan, dvt, donGia, thanhTien] = row.split('_a_');
-                const product = {
-                    stt: index + 1,
-                    maSP: decodeURIComponent(maSP),
-                    tenSP: decodeURIComponent(tenSP),
-                    slBan: slBan,
-                    dvt: decodeURIComponent(dvt),
-                    donGia: parseFloat(donGia),
-                    thanhTien: parseFloat(thanhTien)
-                };
-                products.push(product);
-                totalAmount += product.thanhTien;
+                const parts = row.split('_a_');
+                if (parts.length >= 6) {
+                    const product = {
+                        stt: index + 1,
+                        maSP: decodeURIComponent(parts[0] || ''),
+                        tenSP: decodeURIComponent(parts[1] || ''),
+                        slBan: parts[2] || '0',
+                        dvt: decodeURIComponent(parts[3] || ''),
+                        donGia: parseFloat(parts[4] || '0'),
+                        thanhTien: parseFloat(parts[5] || '0')
+                    };
+                    products.push(product);
+                    totalAmount += product.thanhTien;
+                }
             });
             
             return { products, totalAmount };
