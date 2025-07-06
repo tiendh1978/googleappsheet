@@ -9,16 +9,19 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
+            line-height: 1.6;
         }
-        .invoice-box {
+        .invoice-container {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            border: 1px solid #eee;
+            border: 1px solid #ddd;
         }
         .header {
             text-align: center;
             margin-bottom: 20px;
+            border-bottom: 2px solid #0066cc;
+            padding-bottom: 10px;
         }
         .company-name {
             font-size: 24px;
@@ -29,6 +32,7 @@
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
+            font-size: 14px;
         }
         th, td {
             border: 1px solid #ddd;
@@ -44,35 +48,32 @@
         }
         .total-row {
             font-weight: bold;
-            background-color: #f2f2f2;
+            background-color: #f8f9fa;
         }
         .signature {
-            margin-top: 50px;
+            margin-top: 40px;
             text-align: right;
         }
     </style>
 </head>
 <body>
-    <div class="invoice-box">
+    <div class="invoice-container">
         <div class="header">
             <div class="company-name">CÔNG TY TNHH TRUNG KHẢI</div>
+            <div style="font-weight: bold;">TỔNG ĐẠI LÝ PHÂN PHỐI NƯỚC</div>
             <div>ĐT: 0334 35 3993 - 0971 60 1771</div>
         </div>
         
-        <h2 style="text-align: center;">HÓA ĐƠN BÁN HÀNG</h2>
-        
-        <div style="margin-bottom: 15px;">
-            <strong>Mã đơn:</strong> <span id="order-code"></span> | 
-            <strong>Ngày:</strong> <span id="order-date"></span>
-        </div>
-        
-        <div style="margin-bottom: 15px;">
-            <strong>Khách hàng:</strong> <span id="customer-name"></span> | 
-            <strong>Điện thoại:</strong> <span id="customer-phone"></span>
+        <div style="text-align: center; font-size: 20px; font-weight: bold; margin: 15px 0; color: #d9534f;">
+            HÓA ĐƠN BÁN HÀNG
         </div>
         
         <div style="margin-bottom: 20px;">
-            <strong>Địa chỉ:</strong> <span id="customer-address"></span>
+            <p><strong>Mã đơn:</strong> <span id="order-code"></span></p>
+            <p><strong>Ngày:</strong> <span id="order-date"></span></p>
+            <p><strong>Khách hàng:</strong> <span id="customer-name"></span></p>
+            <p><strong>Điện thoại:</strong> <span id="customer-phone"></span></p>
+            <p><strong>Địa chỉ:</strong> <span id="customer-address"></span></p>
         </div>
         
         <table>
@@ -80,7 +81,7 @@
                 <tr>
                     <th>STT</th>
                     <th>Mã SP</th>
-                    <th>Tên SP</th>
+                    <th>Tên sản phẩm</th>
                     <th>SL</th>
                     <th>ĐVT</th>
                     <th>Đơn giá</th>
@@ -90,55 +91,57 @@
             <tbody id="product-body"></tbody>
             <tfoot>
                 <tr class="total-row">
-                    <td colspan="6">TỔNG CỘNG</td>
+                    <td colspan="6">TỔNG CỘNG:</td>
                     <td id="total-amount"></td>
                 </tr>
             </tfoot>
         </table>
         
         <div class="signature">
-            <div>Hà Nội, ngày <span id="current-date"></span></div>
-            <div style="margin-top: 30px;">Người lập đơn</div>
-            <div><strong>TRẦN TRUNG KHẢI</strong></div>
+            <p>Hà Nội, ngày <span id="current-date"></span></p>
+            <p style="margin-top: 30px;">Người lập đơn</p>
+            <p style="margin-top: 50px;"><strong>TRẦN TRUNG KHẢI</strong></p>
         </div>
     </div>
 
     <script>
         // Hàm lấy tham số URL
         function getUrlParam(name) {
-            const url = new URL(window.location.href);
-            return url.searchParams.get(name);
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
         }
 
-        // Hàm định dạng tiền
-        function formatMoney(num) {
-            return new Intl.NumberFormat('vi-VN').format(num) + 'đ';
+        // Hàm định dạng tiền tệ
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
         }
 
         // Hàm xử lý dữ liệu sản phẩm
-        function parseProducts(productsParam) {
-            if (!productsParam) return [];
+        function processProducts(dataStr) {
+            if (!dataStr) return { products: [], total: 0 };
             
-            const decoded = decodeURIComponent(productsParam);
             const products = [];
             let total = 0;
             
-            // Xử lý từng sản phẩm (phân cách bằng dấu phẩy)
-            const productGroups = decoded.split(', ');
+            // Tách các sản phẩm (phân cách bằng ||)
+            const productRows = decodeURIComponent(dataStr).split('||');
             
-            productGroups.forEach((group, index) => {
-                const parts = group.split('_a_');
-                if (parts.length >= 7) {
-                    const price = parseFloat(parts[5]) || 0;
-                    const amount = parseFloat(parts[6]) || 0;
+            productRows.forEach((row, index) => {
+                if (!row.trim()) return;
+                
+                // Tách các cột (phân cách bằng |)
+                const cols = row.split('|');
+                if (cols.length >= 7) {
+                    const price = parseFloat(cols[5]) || 0;
+                    const amount = parseFloat(cols[6]) || 0;
                     total += amount;
                     
                     products.push({
                         stt: index + 1,
-                        maSP: parts[1] || '',
-                        tenSP: parts[2] || '',
-                        slBan: parts[3] || '',
-                        dvt: parts[4] || '',
+                        maSP: cols[1] || '',
+                        tenSP: cols[2] || '',
+                        slBan: cols[3] || '',
+                        dvt: cols[4] || '',
                         donGia: price,
                         thanhTien: amount
                     });
@@ -149,7 +152,7 @@
         }
 
         // Hàm hiển thị dữ liệu
-        function loadData() {
+        function displayData() {
             try {
                 // Header
                 const header = JSON.parse(decodeURIComponent(getUrlParam('header') || '{}');
@@ -165,23 +168,23 @@
                 tbody.innerHTML = '';
                 
                 if (productsParam) {
-                    const { products, total } = parseProducts(productsParam);
+                    const { products, total } = processProducts(productsParam);
                     
                     products.forEach(product => {
-                        tbody.innerHTML += `
-                            <tr>
-                                <td>${product.stt}</td>
-                                <td>${product.maSP}</td>
-                                <td class="text-left">${product.tenSP}</td>
-                                <td>${product.slBan}</td>
-                                <td>${product.dvt}</td>
-                                <td>${formatMoney(product.donGia)}</td>
-                                <td>${formatMoney(product.thanhTien)}</td>
-                            </tr>
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${product.stt}</td>
+                            <td>${product.maSP}</td>
+                            <td class="text-left">${product.tenSP}</td>
+                            <td>${product.slBan}</td>
+                            <td>${product.dvt}</td>
+                            <td>${formatCurrency(product.donGia)}</td>
+                            <td>${formatCurrency(product.thanhTien)}</td>
                         `;
+                        tbody.appendChild(row);
                     });
                     
-                    document.getElementById('total-amount').textContent = formatMoney(total);
+                    document.getElementById('total-amount').textContent = formatCurrency(total);
                 }
                 
                 // Ngày hiện tại
@@ -189,14 +192,14 @@
                 document.getElementById('current-date').textContent = 
                     `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
                 
-            } catch (e) {
-                console.error('Error:', e);
+            } catch (error) {
+                console.error('Error:', error);
                 alert('Có lỗi khi tải dữ liệu hóa đơn');
             }
         }
 
-        // Tự động chạy khi trang load
-        window.onload = loadData;
+        // Tự động chạy khi trang tải
+        document.addEventListener('DOMContentLoaded', displayData);
     </script>
 </body>
 </html>
