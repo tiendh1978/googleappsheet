@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="version" content="2024-07-05-v3">
+    <meta name="version" content="2024-07-05-v4">
     <title>HÓA ĐƠN BÁN HÀNG - CÔNG TY TRUNG KHẢI</title>
     <style>
         * {
@@ -19,80 +19,100 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 10px;
         }
         
         .invoice-container {
             width: 210mm;
-            min-height: 297mm;
+            height: 148mm; /* Khổ A5 ngang */
             background: white;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            padding: 15mm;
+            padding: 10mm;
             margin: 0 auto;
         }
         
         .header {
-            text-align: center;
-            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
             border-bottom: 2px solid #333;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
+        }
+        
+        .logo-section {
+            width: 25%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .logo {
+            max-width: 80px;
+            margin-bottom: 5px;
+        }
+        
+        .company-info {
+            width: 50%;
+            text-align: center;
         }
         
         .company-name {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: bold;
             text-transform: uppercase;
             color: #0066cc;
         }
         
+        .qr-section {
+            width: 25%;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .qr-code {
+            max-width: 70px;
+            max-height: 70px;
+        }
+        
         .invoice-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             text-transform: uppercase;
-            margin: 15px 0;
+            margin: 10px 0;
             text-align: center;
         }
         
-        .customer-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .info-box {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-        
-        .info-label {
-            font-weight: bold;
+        .order-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
             font-size: 13px;
-            margin-bottom: 3px;
         }
         
-        .info-value {
-            font-size: 14px;
+        .address-row {
+            margin-bottom: 8px;
+            font-size: 13px;
         }
         
         .product-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 15px 0;
-            font-size: 13px;
+            margin: 10px 0;
+            font-size: 12px;
         }
         
         .product-table th {
             background-color: #0066cc;
             color: white;
-            padding: 8px;
+            padding: 5px;
             text-align: center;
             border: 1px solid #ddd;
+            font-weight: bold;
         }
         
         .product-table td {
             border: 1px solid #ddd;
-            padding: 6px;
+            padding: 4px;
             text-align: center;
         }
         
@@ -102,15 +122,28 @@
         }
         
         .notes {
-            margin-top: 20px;
-            font-size: 13px;
-            line-height: 1.5;
+            margin-top: 10px;
+            font-size: 12px;
+            line-height: 1.4;
+            display: flex;
+            justify-content: space-between;
         }
         
-        .signature {
-            margin-top: 40px;
+        .notes-left {
+            width: 70%;
+        }
+        
+        .notes-right {
+            width: 25%;
             text-align: right;
-            font-style: italic;
+        }
+        
+        .footer {
+            margin-top: 15px;
+            font-size: 12px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            padding-top: 5px;
         }
         
         @media print {
@@ -121,6 +154,7 @@
                 box-shadow: none;
                 padding: 0;
                 width: 100%;
+                height: 100%;
             }
         }
     </style>
@@ -128,34 +162,30 @@
 <body>
     <div class="invoice-container">
         <div class="header">
-            <div class="company-name">CÔNG TY TNHH TRUNG KHẢI</div>
-            <div style="font-weight: bold; margin: 5px 0;">TỔNG ĐẠI LÝ PHÂN PHỐI NƯỚC</div>
-            <div>ĐT: 0334 35 3993 - 0971 60 1771</div>
+            <div class="logo-section">
+                <img src="https://via.placeholder.com/80x40?text=LAVIE" alt="Lavie" class="logo">
+                <img src="https://via.placeholder.com/80x40?text=MIRU" alt="Miru" class="logo">
+            </div>
+            <div class="company-info">
+                <div class="company-name">CÔNG TY TNHH TRUNG KHẢI</div>
+                <div style="font-weight: bold; margin: 3px 0; font-size: 14px;">TỔNG ĐẠI LÝ PHÂN PHỐI NƯỚC</div>
+                <div style="font-size: 13px;">ĐT: 0334 35 3993 - 0971 60 1771</div>
+            </div>
+            <div class="qr-section">
+                <img id="qr-code-img" src="" alt="QR Code" class="qr-code">
+            </div>
         </div>
         
         <div class="invoice-title">HÓA ĐƠN BÁN HÀNG</div>
         
-        <div class="customer-info">
-            <div class="info-box">
-                <div class="info-label">Mã đơn hàng</div>
-                <div class="info-value" id="order-code"></div>
-            </div>
-            <div class="info-box">
-                <div class="info-label">Ngày</div>
-                <div class="info-value" id="order-date"></div>
-            </div>
-            <div class="info-box">
-                <div class="info-label">Tên khách hàng</div>
-                <div class="info-value" id="customer-name"></div>
-            </div>
-            <div class="info-box">
-                <div class="info-label">Điện thoại</div>
-                <div class="info-value" id="customer-phone"></div>
-            </div>
-            <div class="info-box" style="grid-column: span 2;">
-                <div class="info-label">Địa chỉ</div>
-                <div class="info-value" id="customer-address"></div>
-            </div>
+        <div class="order-info">
+            <div><strong>Mã đơn hàng:</strong> <span id="order-code"></span></div>
+            <div><strong>Ngày:</strong> <span id="order-date"></span></div>
+            <div><strong>Điện thoại:</strong> <span id="customer-phone"></span></div>
+        </div>
+        
+        <div class="address-row">
+            <div><strong>Địa chỉ:</strong> <span id="customer-address"></span></div>
         </div>
         
         <table class="product-table">
@@ -182,23 +212,28 @@
         </table>
         
         <div class="notes">
-            <p><strong>Ghi chú:</strong></p>
-            <p>- Đặt cọc 50.000 đ/vô</p>
-            <p>- Không lấy nước sẽ tính phí</p>
-            <p>- Phí bè: T2 (5k), T3 (10k), T4 (15k)/bình</p>
-            <p>- Hỗ trợ phí gửi xe (nếu có)</p>
+            <div class="notes-left">
+                <p><strong>Ghi chú:</strong></p>
+                <p>- Đơn hàng được giao từ 8h-21h các ngày trong tuần</p>
+                <p>- Quý khách vui lòng kiểm tra hàng trước khi thanh toán</p>
+                <p>- Nhân viên sẽ chụp ảnh xác nhận khi giao hàng thành công</p>
+                <p>- Mọi thắc mắc vui lòng liên hệ hotline: 0334 35 3993</p>
+            </div>
+            <div class="notes-right">
+                <p><strong>Người nhận hàng</strong></p>
+                <p id="receiver-name" style="margin-top: 20px;"></p>
+            </div>
         </div>
         
-        <div class="signature">
-            <p>Hà Nội, ngày <span id="print-day"></span> tháng <span id="print-month"></span> năm <span id="print-year"></span></p>
-            <p style="margin-top: 30px;">Người lập đơn</p>
-            <p style="margin-top: 50px;"><strong>TRẦN TRUNG KHẢI</strong></p>
+        <div class="footer">
+            <p>Cảm ơn Quý khách đã sử dụng dịch vụ của chúng tôi</p>
+            <p>Hẹn gặp lại Quý khách trong các đơn hàng tiếp theo</p>
         </div>
     </div>
 
     <script>
         // Phiên bản template
-        const TEMPLATE_VERSION = "2024-07-05-v3";
+        const TEMPLATE_VERSION = "2024-07-05-v4";
         console.log("Đang sử dụng template version:", TEMPLATE_VERSION);
         
         // Hàm lấy tham số từ URL
@@ -216,7 +251,7 @@
             return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
         }
 
-        // Hàm xử lý dữ liệu sản phẩm (phiên bản đã sửa)
+        // Hàm xử lý dữ liệu sản phẩm
         function processProducts(productsStr) {
             if (!productsStr) {
                 console.error("Không có dữ liệu sản phẩm");
@@ -290,9 +325,14 @@
                     const header = JSON.parse(headerParam);
                     document.getElementById('order-code').textContent = header.MaDonHang || '';
                     document.getElementById('order-date').textContent = header.Ngay || '';
-                    document.getElementById('customer-name').textContent = header.TenKhachHang || '';
                     document.getElementById('customer-phone').textContent = header.DienThoai || '';
                     document.getElementById('customer-address').textContent = header.DiaChi || '';
+                    document.getElementById('receiver-name').textContent = header.NguoiNhan || '';
+                    
+                    // Hiển thị QR code nếu có
+                    if (header.QRCode) {
+                        document.getElementById('qr-code-img').src = header.QRCode;
+                    }
                     
                     console.log("Đã xử lý xong thông tin header");
                 }
@@ -305,7 +345,10 @@
                 if (productsParam) {
                     const { products, totalAmount } = processProducts(productsParam);
                     
-                    products.forEach(product => {
+                    // Giới hạn tối đa 7 dòng sản phẩm
+                    const displayProducts = products.slice(0, 7);
+                    
+                    displayProducts.forEach(product => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>${product.stt}</td>
@@ -319,15 +362,24 @@
                         tbody.appendChild(row);
                     });
                     
+                    // Thêm dòng trống nếu cần
+                    for (let i = displayProducts.length; i < 7; i++) {
+                        const emptyRow = document.createElement('tr');
+                        emptyRow.innerHTML = `
+                            <td>${i + 1}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        `;
+                        tbody.appendChild(emptyRow);
+                    }
+                    
                     document.getElementById('total-amount').textContent = formatCurrency(totalAmount);
-                    console.log("Đã hiển thị", products.length, "sản phẩm");
+                    console.log("Đã hiển thị", displayProducts.length, "sản phẩm");
                 }
-
-                // Hiển thị ngày in
-                const today = new Date();
-                document.getElementById('print-day').textContent = today.getDate();
-                document.getElementById('print-month').textContent = today.getMonth() + 1;
-                document.getElementById('print-year').textContent = today.getFullYear();
 
                 // Tự động in nếu có tham số ?print=true
                 if (getUrlParameter('print') === 'true') {
