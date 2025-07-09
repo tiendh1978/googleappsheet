@@ -24,11 +24,11 @@
         }
         
         .invoice-container {
-            width: 190mm;
+            width: 200mm;
             min-height: 138mm;
             background: white;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            padding: 15mm;
+            padding: 10mm 15mm;
             margin: 0 auto;
             position: relative;
         }
@@ -37,14 +37,15 @@
         .header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             border-bottom: 2px solid #333;
-            padding-bottom: 8px;
+            padding-bottom: 6px;
         }
         
         .bank-info {
             width: 25%;
             font-size: 12px;
+            padding-left: 2mm;
         }
         
         .bank-title {
@@ -68,11 +69,12 @@
             width: 25%;
             display: flex;
             justify-content: flex-end;
+            padding-right: 2mm;
         }
         
         .qr-code {
-            width: 70px;
-            height: 70px;
+            width: 85px; /* Tăng 20% từ 70px */
+            height: 85px;
             object-fit: contain;
         }
         
@@ -81,7 +83,7 @@
             font-size: 18px;
             font-weight: bold;
             text-transform: uppercase;
-            margin: 10px 0;
+            margin: 8px 0;
             text-align: center;
         }
         
@@ -89,17 +91,17 @@
         .order-info {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-size: 13px;
         }
         
         .address-row {
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             font-size: 13px;
         }
         
         .address-notes {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-size: 13px;
             color: #555;
         }
@@ -108,7 +110,7 @@
         .product-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 10px 0;
+            margin: 8px 0;
             font-size: 12px;
             table-layout: fixed;
         }
@@ -116,7 +118,7 @@
         .product-table th {
             background-color: #0066cc;
             color: white;
-            padding: 5px;
+            padding: 4px;
             text-align: center;
             border: 1px solid #ddd;
             font-weight: bold;
@@ -124,7 +126,7 @@
         
         .product-table td {
             border: 1px solid #ddd;
-            padding: 4px;
+            padding: 3px;
             text-align: center;
             word-wrap: break-word;
         }
@@ -136,15 +138,16 @@
         
         /* Ghi chú */
         .notes {
-            margin-top: 10px;
+            margin-top: 8px;
             font-size: 12px;
+            page-break-inside: avoid;
         }
         
         /* Thiết lập khi in */
         @media print {
             @page {
                 size: A5 landscape;
-                margin: 0;
+                margin: 5mm;
             }
             body {
                 margin: 0;
@@ -152,21 +155,22 @@
                 background: none;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
+                width: 200mm;
             }
             .invoice-container {
-                width: 190mm;
+                width: 200mm;
                 min-height: 138mm;
                 margin: 0;
-                padding: 10mm;
+                padding: 8mm 12mm;
                 box-shadow: none;
             }
-            .header, .bank-info, .company-info, .qr-section {
-                padding-left: 0;
-                margin-left: 0;
-            }
             /* Đảm bảo không bị cắt nội dung */
-            .bank-info, .company-info, .qr-section {
-                overflow: visible;
+            .notes, .product-table {
+                page-break-inside: avoid;
+            }
+            .qr-code {
+                width: 85px;
+                height: 85px;
             }
         }
     </style>
@@ -182,7 +186,7 @@
             </div>
             <div class="company-info">
                 <div class="company-name">CÔNG TY TNHH TRUNG KHẢI</div>
-                <div style="font-weight: bold; margin: 3px 0; font-size: 14px;">TỔNG ĐẠI LÝ PHÂN PHỐI NƯỚC</div>
+                <div style="font-weight: bold; margin: 2px 0; font-size: 14px;">TỔNG ĐẠI LÝ PHÂN PHỐI NƯỚC</div>
                 <div style="font-size: 13px;">ĐT: 0334 35 3993 - 0971 60 1771</div>
             </div>
             <div class="qr-section">
@@ -263,7 +267,7 @@
 
     <script>
         // Phiên bản template
-        const TEMPLATE_VERSION = "2024-07-05-v5";
+        const TEMPLATE_VERSION = "2024-07-05-v6";
         console.log("Template version:", TEMPLATE_VERSION);
         
         // Hàm lấy tham số từ URL
