@@ -21,6 +21,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            margin: 0;
         }
         
         .invoice-container {
@@ -28,7 +29,7 @@
             min-height: 135mm;
             background: white;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            padding: 8mm 12mm;
+            padding: 7mm 10mm;
             margin: 0 auto;
             position: relative;
         }
@@ -37,9 +38,9 @@
         .header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             border-bottom: 1px solid #333;
-            padding-bottom: 4px;
+            padding-bottom: 3px;
         }
         
         .bank-info {
@@ -63,6 +64,7 @@
             font-weight: bold;
             text-transform: uppercase;
             color: #0066cc;
+            margin-bottom: 2px;
         }
         
         .qr-section {
@@ -73,8 +75,8 @@
         }
         
         .qr-code {
-            width: 80px;
-            height: 80px;
+            width: 75px;
+            height: 75px;
             object-fit: contain;
         }
         
@@ -83,7 +85,7 @@
             font-size: 16px;
             font-weight: bold;
             text-transform: uppercase;
-            margin: 6px 0;
+            margin: 5px 0;
             text-align: center;
         }
         
@@ -91,18 +93,18 @@
         .order-info {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 4px;
-            font-size: 12px;
+            margin-bottom: 3px;
+            font-size: 11px;
         }
         
         .address-row {
-            margin-bottom: 3px;
-            font-size: 12px;
+            margin-bottom: 2px;
+            font-size: 11px;
         }
         
         .address-notes {
-            margin-bottom: 6px;
-            font-size: 12px;
+            margin-bottom: 5px;
+            font-size: 11px;
             color: #555;
         }
         
@@ -110,15 +112,15 @@
         .product-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 6px 0;
-            font-size: 11px;
+            margin: 5px 0;
+            font-size: 10px;
             table-layout: fixed;
         }
         
         .product-table th {
             background-color: #0066cc;
             color: white;
-            padding: 3px;
+            padding: 2px;
             text-align: center;
             border: 1px solid #ddd;
             font-weight: bold;
@@ -138,8 +140,8 @@
         
         /* Ghi chú */
         .notes {
-            margin-top: 6px;
-            font-size: 11px;
+            margin-top: 5px;
+            font-size: 10px;
             page-break-inside: avoid;
         }
         
@@ -147,7 +149,7 @@
         @media print {
             @page {
                 size: A5 landscape;
-                margin: 3mm 5mm;
+                margin: 2mm 4mm;
             }
             body {
                 margin: 0;
@@ -161,7 +163,7 @@
                 width: 195mm;
                 min-height: 135mm;
                 margin: 0;
-                padding: 6mm 10mm;
+                padding: 5mm 8mm;
                 box-shadow: none;
             }
             /* Đảm bảo không bị cắt nội dung */
@@ -169,8 +171,8 @@
                 page-break-inside: avoid;
             }
             .qr-code {
-                width: 80px;
-                height: 80px;
+                width: 75px;
+                height: 75px;
             }
         }
     </style>
@@ -186,8 +188,8 @@
             </div>
             <div class="company-info">
                 <div class="company-name">CÔNG TY TNHH TRUNG KHẢI</div>
-                <div style="font-weight: bold; margin: 1px 0; font-size: 13px;">TỔNG ĐẠI LÝ PHÂN PHỐI NƯỚC</div>
-                <div style="font-size: 12px;">ĐT: 0334 35 3993 - 0971 60 1771</div>
+                <div style="font-weight: bold; margin: 1px 0; font-size: 12px;">TỔNG ĐẠI LÝ PHÂN PHỐI NƯỚC</div>
+                <div style="font-size: 11px;">ĐT: 0334 35 3993 - 0971 60 1771</div>
             </div>
             <div class="qr-section">
                 <img id="qr-code-img" src="" alt="QR Code" class="qr-code">
@@ -197,17 +199,17 @@
         <div class="invoice-title">HÓA ĐƠN BÁN HÀNG</div>
         
         <div class="order-info">
-            <div><strong>Mã đơn hàng:</strong> <span id="order-code">DH001</span></div>
-            <div><strong>Ngày:</strong> <span id="order-date">10/07/2024</span></div>
-            <div><strong>Điện thoại:</strong> <span id="customer-phone">0912345678</span></div>
+            <div><strong>Mã đơn hàng:</strong> <span id="order-code"></span></div>
+            <div><strong>Ngày:</strong> <span id="order-date"></span></div>
+            <div><strong>Điện thoại:</strong> <span id="customer-phone"></span></div>
         </div>
         
         <div class="address-row">
-            <div><strong>Địa chỉ:</strong> <span id="customer-address">123 Đường ABC, Quận 1, TP.HCM</span></div>
+            <div><strong>Địa chỉ:</strong> <span id="customer-address"></span></div>
         </div>
         
         <div class="address-notes">
-            <div><strong>Lưu ý địa chỉ:</strong> <span id="address-notes">Chung cư XYZ, tầng 5, thang máy</span></div>
+            <div><strong>Lưu ý địa chỉ:</strong> <span id="address-notes"></span></div>
         </div>
         
         <table class="product-table">
@@ -223,35 +225,12 @@
                 </tr>
             </thead>
             <tbody id="product-body">
-                <tr>
-                    <td>1</td>
-                    <td>SP001</td>
-                    <td style="text-align: left;">Nước Lavie 500ml</td>
-                    <td>10</td>
-                    <td>chai</td>
-                    <td>15.000 đ</td>
-                    <td>150.000 đ</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>SP002</td>
-                    <td style="text-align: left;">Nước Miru 350ml</td>
-                    <td>5</td>
-                    <td>lon</td>
-                    <td>10.000 đ</td>
-                    <td>50.000 đ</td>
-                </tr>
-                <!-- Thêm dòng trống nếu cần -->
-                <tr><td>3</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>4</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>5</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>6</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>7</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <!-- Sản phẩm sẽ được thêm bằng JavaScript -->
             </tbody>
             <tfoot>
                 <tr class="total-row">
                     <td colspan="6" style="text-align: right;">TỔNG CỘNG:</td>
-                    <td style="text-align: center;">200.000 đ</td>
+                    <td id="total-amount" style="text-align: center;"></td>
                 </tr>
             </tfoot>
         </table>
@@ -267,7 +246,7 @@
 
     <script>
         // Phiên bản template
-        const TEMPLATE_VERSION = "2024-07-05-v7";
+        const TEMPLATE_VERSION = "2024-07-05-v8";
         console.log("Template version:", TEMPLATE_VERSION);
         
         // Hàm lấy tham số từ URL
@@ -285,9 +264,75 @@
             return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
         }
 
+        // Hàm xử lý dữ liệu sản phẩm (giữ nguyên như bản gốc của bạn)
+        function processProducts(productsStr) {
+            if (!productsStr) {
+                console.error("Không có dữ liệu sản phẩm");
+                return [];
+            }
+            
+            console.log("Dữ liệu sản phẩm nhận được:", productsStr);
+            
+            try {
+                const productGroups = productsStr.split('_a_');
+                if (productGroups.length !== 6) {
+                    throw new Error("Sai cấu trúc dữ liệu sản phẩm");
+                }
+
+                const maSPs = productGroups[0].split('_b_');
+                const tenSPs = productGroups[1].split('_b_');
+                const slBans = productGroups[2].split('_b_');
+                const dvts = productGroups[3].split('_b_');
+                const donGias = productGroups[4].split('_b_');
+                const thanhTiens = productGroups[5].split('_b_');
+
+                const products = [];
+                let totalAmount = 0;
+
+                for (let i = 0; i < maSPs.length; i++) {
+                    const product = {
+                        stt: i + 1,
+                        maSP: safeDecode(maSPs[i]),
+                        tenSP: safeDecode(tenSPs[i]),
+                        slBan: slBans[i] || '0',
+                        dvt: safeDecode(dvts[i]),
+                        donGia: parseNumber(donGias[i]),
+                        thanhTien: parseNumber(thanhTiens[i])
+                    };
+                    products.push(product);
+                    totalAmount += product.thanhTien;
+                }
+
+                console.log("Đã xử lý thành công", products.length, "sản phẩm");
+                return { products, totalAmount };
+
+            } catch (error) {
+                console.error("Lỗi khi xử lý sản phẩm:", error);
+                return [];
+            }
+        }
+
+        // Hàm hỗ trợ decode an toàn
+        function safeDecode(value) {
+            try {
+                return decodeURIComponent(value || '').trim();
+            } catch {
+                return (value || '').trim();
+            }
+        }
+
+        // Hàm parse number an toàn
+        function parseNumber(value) {
+            const num = parseFloat(value || '0');
+            return isNaN(num) ? 0 : num;
+        }
+
         // Hàm hiển thị dữ liệu
         function displayData() {
             try {
+                console.log("Bắt đầu xử lý hiển thị hóa đơn...");
+                
+                // Xử lý header
                 const headerParam = getUrlParameter('header');
                 if (headerParam) {
                     const header = JSON.parse(headerParam);
@@ -301,14 +346,63 @@
                     if (header.MaQRThanhToan) {
                         document.getElementById('qr-code-img').src = header.MaQRThanhToan;
                     }
+                    
+                    console.log("Đã xử lý xong thông tin header");
+                }
+
+                // Xử lý sản phẩm
+                const productsParam = getUrlParameter('products');
+                const tbody = document.getElementById('product-body');
+                tbody.innerHTML = '';
+                
+                if (productsParam) {
+                    const { products, totalAmount } = processProducts(productsParam);
+                    
+                    // Giới hạn tối đa 7 dòng sản phẩm
+                    const displayProducts = products.slice(0, 7);
+                    
+                    displayProducts.forEach(product => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${product.stt}</td>
+                            <td>${product.maSP}</td>
+                            <td style="text-align: left;">${product.tenSP}</td>
+                            <td>${product.slBan}</td>
+                            <td>${product.dvt}</td>
+                            <td>${formatCurrency(product.donGia)}</td>
+                            <td>${formatCurrency(product.thanhTien)}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                    
+                    // Thêm dòng trống nếu cần
+                    for (let i = displayProducts.length; i < 7; i++) {
+                        const emptyRow = document.createElement('tr');
+                        emptyRow.innerHTML = `
+                            <td>${i + 1}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        `;
+                        tbody.appendChild(emptyRow);
+                    }
+                    
+                    document.getElementById('total-amount').textContent = formatCurrency(totalAmount);
+                    console.log("Đã hiển thị", displayProducts.length, "sản phẩm");
                 }
 
                 // Tự động in nếu có tham số ?print=true
                 if (getUrlParameter('print') === 'true') {
+                    console.log("Tự động in hóa đơn...");
                     setTimeout(() => {
                         window.print();
                     }, 500);
                 }
+                
+                console.log("Xử lý hóa đơn hoàn tất");
                 
             } catch (error) {
                 console.error("Error processing invoice data:", error);
@@ -317,7 +411,10 @@
         }
 
         // Chạy khi trang tải xong
-        document.addEventListener('DOMContentLoaded', displayData);
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Trang đã tải xong, bắt đầu xử lý...");
+            displayData();
+        });
     </script>
 </body>
 </html>
