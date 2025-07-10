@@ -216,12 +216,13 @@
             <thead>
                 <tr>
                     <th width="5%">STT</th>
-                    <th width="15%">Mã SP</th>
-                    <th width="30%">Tên sản phẩm</th>
-                    <th width="10%">SL</th>
-                    <th width="10%">ĐVT</th>
-                    <th width="15%">Đơn giá</th>
-                    <th width="15%">Thành tiền</th>
+                    <th width="12%">Mã SP</th>
+                    <th width="25%">Tên sản phẩm</th>
+                    <th width="8%">SL</th>
+                    <th width="8%">ĐVT</th>
+                    <th width="12%">Đơn giá</th>
+                    <th width="12%">Chiết khấu</th>
+                    <th width="12%">Thành tiền</th>
                 </tr>
             </thead>
             <tbody id="product-body">
@@ -229,7 +230,7 @@
             </tbody>
             <tfoot>
                 <tr class="total-row">
-                    <td colspan="6" style="text-align: right;">TỔNG CỘNG:</td>
+                    <td colspan="7" style="text-align: right;">TỔNG CỘNG:</td>
                     <td id="total-amount" style="text-align: center;"></td>
                 </tr>
             </tfoot>
@@ -246,7 +247,7 @@
 
     <script>
         // Phiên bản template
-        const TEMPLATE_VERSION = "2024-07-05-v8";
+        const TEMPLATE_VERSION = "2024-07-05-v9";
         console.log("Template version:", TEMPLATE_VERSION);
         
         // Hàm lấy tham số từ URL
@@ -264,7 +265,7 @@
             return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
         }
 
-        // Hàm xử lý dữ liệu sản phẩm (giữ nguyên như bản gốc của bạn)
+        // Hàm xử lý dữ liệu sản phẩm (đã thêm chiết khấu)
         function processProducts(productsStr) {
             if (!productsStr) {
                 console.error("Không có dữ liệu sản phẩm");
@@ -275,7 +276,7 @@
             
             try {
                 const productGroups = productsStr.split('_a_');
-                if (productGroups.length !== 6) {
+                if (productGroups.length !== 7) { // Đã thêm 1 nhóm cho chiết khấu
                     throw new Error("Sai cấu trúc dữ liệu sản phẩm");
                 }
 
@@ -284,7 +285,8 @@
                 const slBans = productGroups[2].split('_b_');
                 const dvts = productGroups[3].split('_b_');
                 const donGias = productGroups[4].split('_b_');
-                const thanhTiens = productGroups[5].split('_b_');
+                const chietKhaus = productGroups[5].split('_b_'); // Thêm chiết khấu
+                const thanhTiens = productGroups[6].split('_b_');
 
                 const products = [];
                 let totalAmount = 0;
@@ -297,6 +299,7 @@
                         slBan: slBans[i] || '0',
                         dvt: safeDecode(dvts[i]),
                         donGia: parseNumber(donGias[i]),
+                        chietKhau: parseNumber(chietKhaus[i] || '0'), // Xử lý chiết khấu
                         thanhTien: parseNumber(thanhTiens[i])
                     };
                     products.push(product);
@@ -370,6 +373,7 @@
                             <td>${product.slBan}</td>
                             <td>${product.dvt}</td>
                             <td>${formatCurrency(product.donGia)}</td>
+                            <td>${formatCurrency(product.chietKhau)}</td>
                             <td>${formatCurrency(product.thanhTien)}</td>
                         `;
                         tbody.appendChild(row);
@@ -380,6 +384,7 @@
                         const emptyRow = document.createElement('tr');
                         emptyRow.innerHTML = `
                             <td>${i + 1}</td>
+                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
