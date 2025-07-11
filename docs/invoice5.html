@@ -21,7 +21,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
+            margin: 2mm;
         }
         
         .invoice-container {
@@ -29,7 +29,7 @@
             min-height: 135mm;
             background: white;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            padding: 7mm 10mm;
+            padding: 2mm;
             margin: 0 auto;
             position: relative;
         }
@@ -75,8 +75,8 @@
         }
         
         .qr-code {
-            width: 75px;
-            height: 75px;
+            width: 97.5px;
+            height: 97.5px;
             object-fit: contain;
         }
         
@@ -91,6 +91,13 @@
         
         /* Thông tin đơn hàng */
         .order-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3px;
+            font-size: 11px;
+        }
+        
+        .additional-info {
             display: flex;
             justify-content: space-between;
             margin-bottom: 3px;
@@ -113,7 +120,7 @@
             width: 100%;
             border-collapse: collapse;
             margin: 5px 0;
-            font-size: 10px;
+            font-size: 12.5px;
             table-layout: fixed;
         }
         
@@ -133,23 +140,61 @@
             word-wrap: break-word;
         }
         
-        .total-row {
+        .total-row-bold {
             font-weight: bold;
             background-color: #f2f2f2;
+            text-align: right;
+            padding-right: 15px;
+            font-size: 15px;
+        }
+        
+        .total-formula-small {
+            font-size: 12px;
+            font-weight: normal;
         }
         
         /* Ghi chú */
-        .notes {
+        .notes-section {
             margin-top: 5px;
-            font-size: 10px;
+            font-size: 11px;
             page-break-inside: avoid;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3px;
+        }
+        
+        .notes-title {
+            width: 50%;
+        }
+        
+        .delivery-person {
+            width: 25%;
+            text-align: center;
+        }
+        
+        .receiver {
+            width: 25%;
+            text-align: right;
+        }
+        
+        .notes-content {
+            font-size: 11px;
+        }
+        
+        .notes-content p {
+            margin: 1px 0;
         }
         
         /* Thiết lập khi in */
         @media print {
             @page {
                 size: A5 landscape;
-                margin: 2mm 4mm;
+                margin: 2mm;
             }
             body {
                 margin: 0;
@@ -163,16 +208,15 @@
                 width: 195mm;
                 min-height: 135mm;
                 margin: 0;
-                padding: 5mm 8mm;
+                padding: 2mm;
                 box-shadow: none;
             }
-            /* Đảm bảo không bị cắt nội dung */
-            .notes, .product-table {
+            .notes-section, .product-table {
                 page-break-inside: avoid;
             }
             .qr-code {
-                width: 75px;
-                height: 75px;
+                width: 97.5px;
+                height: 97.5px;
             }
         }
     </style>
@@ -204,6 +248,12 @@
             <div><strong>Điện thoại:</strong> <span id="customer-phone"></span></div>
         </div>
         
+        <div class="additional-info">
+            <div><strong>Ngày Lấy Gần Nhất:</strong> <span id="last-pickup-date"></span></div>
+            <div><strong>Số ngày:</strong> <span id="days-count"></span></div>
+            <div><strong>Tổng Lần Lấy:</strong> <span id="total-pickups"></span></div>
+        </div>
+        
         <div class="address-row">
             <div><strong>Địa chỉ:</strong> <span id="customer-address"></span></div>
         </div>
@@ -229,25 +279,34 @@
                 <!-- Sản phẩm sẽ được thêm bằng JavaScript -->
             </tbody>
             <tfoot>
-                <tr class="total-row">
-                    <td colspan="7" style="text-align: right;">TỔNG CỘNG:</td>
-                    <td id="total-amount" style="text-align: center;"></td>
+                <tr class="total-row-bold">
+                    <td colspan="8">
+                        TỔNG CỘNG: <span id="total-amount">0</span>-<span id="total-discount">0</span> = <span id="final-amount">0</span>
+                        <span class="total-formula-small"> (Tổng Thành Tiền - Tổng Chiết Khấu)</span>
+                    </td>
                 </tr>
             </tfoot>
         </table>
         
-        <div class="notes">
-            <p><strong>Ghi chú:</strong></p>
-            <p>- Khách thiếu vỏ vui lòng đặt cọc 50.000 đ/vỏ</p>
-            <p>- Khách hàng không lấy nước đi thu vỏ sẽ tính phí</p>
-            <p>- Phí bê lên tầng 2 là 5.000 đ/bình, tầng 3 là 10.000 đ/bình, tầng 4 là 15.000 đ/bình</p>
-            <p>- Quý khách vui lòng hỗ trợ phí gửi xe (nếu có)</p>
+        <div class="notes-section">
+            <div class="notes-header">
+                <div class="notes-title"><strong>Ghi chú:</strong></div>
+                <div class="delivery-person"><strong>Người Giao Hàng</strong></div>
+                <div class="receiver"><strong>Người Nhận Hàng</strong></div>
+            </div>
+            <div class="notes-content">
+                <p>- Khách thiếu vỏ vui lòng đặt cọc 50.000 đ/vỏ</p>
+                <p>- Khách hàng không lấy nước đi thu vỏ sẽ tính phí</p>
+                <p>- Phí bê lên tầng 2 là 5.000 đ/bình, tầng 3 là 10.000 đ/bình,</p>
+                <p>tầng 4 là 15.000 đ/bình</p>
+                <p>- Quý khách vui lòng hỗ trợ phí gửi xe (nếu có)</p>
+            </div>
         </div>
     </div>
 
     <script>
         // Phiên bản template
-        const TEMPLATE_VERSION = "2024-07-05-v9";
+        const TEMPLATE_VERSION = "2024-07-05-v12";
         console.log("Template version:", TEMPLATE_VERSION);
         
         // Hàm lấy tham số từ URL
@@ -265,7 +324,7 @@
             return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
         }
 
-        // Hàm xử lý dữ liệu sản phẩm (đã thêm chiết khấu)
+        // Hàm xử lý dữ liệu sản phẩm
         function processProducts(productsStr) {
             if (!productsStr) {
                 console.error("Không có dữ liệu sản phẩm");
@@ -276,7 +335,7 @@
             
             try {
                 const productGroups = productsStr.split('_a_');
-                if (productGroups.length !== 7) { // Đã thêm 1 nhóm cho chiết khấu
+                if (productGroups.length !== 7) {
                     throw new Error("Sai cấu trúc dữ liệu sản phẩm");
                 }
 
@@ -285,11 +344,12 @@
                 const slBans = productGroups[2].split('_b_');
                 const dvts = productGroups[3].split('_b_');
                 const donGias = productGroups[4].split('_b_');
-                const chietKhaus = productGroups[5].split('_b_'); // Thêm chiết khấu
+                const chietKhaus = productGroups[5].split('_b_');
                 const thanhTiens = productGroups[6].split('_b_');
 
                 const products = [];
                 let totalAmount = 0;
+                let totalDiscount = 0;
 
                 for (let i = 0; i < maSPs.length; i++) {
                     const product = {
@@ -299,15 +359,16 @@
                         slBan: slBans[i] || '0',
                         dvt: safeDecode(dvts[i]),
                         donGia: parseNumber(donGias[i]),
-                        chietKhau: parseNumber(chietKhaus[i] || '0'), // Xử lý chiết khấu
+                        chietKhau: parseNumber(chietKhaus[i] || '0'),
                         thanhTien: parseNumber(thanhTiens[i])
                     };
                     products.push(product);
                     totalAmount += product.thanhTien;
+                    totalDiscount += product.chietKhau;
                 }
 
                 console.log("Đã xử lý thành công", products.length, "sản phẩm");
-                return { products, totalAmount };
+                return { products, totalAmount, totalDiscount, finalAmount: totalAmount - totalDiscount };
 
             } catch (error) {
                 console.error("Lỗi khi xử lý sản phẩm:", error);
@@ -345,12 +406,15 @@
                     document.getElementById('customer-address').textContent = header.DiaChi || '';
                     document.getElementById('address-notes').textContent = header.ThongTinThemDC || '';
                     
+                    // Thêm thông tin mới từ bảng cha
+                    document.getElementById('last-pickup-date').textContent = header['Lần Lấy Trước'] || '';
+                    document.getElementById('days-count').textContent = header['Số Ngày'] || '';
+                    document.getElementById('total-pickups').textContent = header['Tổng Lần Lấy'] || '';
+                    
                     // Hiển thị QR code thanh toán từ bảng cha
                     if (header.MaQRThanhToan) {
                         document.getElementById('qr-code-img').src = header.MaQRThanhToan;
                     }
-                    
-                    console.log("Đã xử lý xong thông tin header");
                 }
 
                 // Xử lý sản phẩm
@@ -359,7 +423,7 @@
                 tbody.innerHTML = '';
                 
                 if (productsParam) {
-                    const { products, totalAmount } = processProducts(productsParam);
+                    const { products, totalAmount, totalDiscount, finalAmount } = processProducts(productsParam);
                     
                     // Giới hạn tối đa 7 dòng sản phẩm
                     const displayProducts = products.slice(0, 7);
@@ -395,19 +459,18 @@
                         tbody.appendChild(emptyRow);
                     }
                     
-                    document.getElementById('total-amount').textContent = formatCurrency(totalAmount);
-                    console.log("Đã hiển thị", displayProducts.length, "sản phẩm");
+                    // Cập nhật tổng cộng
+                    document.getElementById('total-amount').textContent = formatCurrency(totalAmount).replace(' đ', '');
+                    document.getElementById('total-discount').textContent = formatCurrency(totalDiscount).replace(' đ', '');
+                    document.getElementById('final-amount').textContent = formatCurrency(finalAmount).replace(' đ', '');
                 }
 
                 // Tự động in nếu có tham số ?print=true
                 if (getUrlParameter('print') === 'true') {
-                    console.log("Tự động in hóa đơn...");
                     setTimeout(() => {
                         window.print();
                     }, 500);
                 }
-                
-                console.log("Xử lý hóa đơn hoàn tất");
                 
             } catch (error) {
                 console.error("Error processing invoice data:", error);
@@ -416,10 +479,7 @@
         }
 
         // Chạy khi trang tải xong
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("Trang đã tải xong, bắt đầu xử lý...");
-            displayData();
-        });
+        document.addEventListener('DOMContentLoaded', displayData);
     </script>
 </body>
 </html>
