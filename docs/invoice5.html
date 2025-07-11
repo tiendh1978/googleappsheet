@@ -194,6 +194,10 @@
     </div>
 
     <script>
+        // Phiên bản template
+        const TEMPLATE_VERSION = "2024-07-12-v1";
+        console.log("Template version:", TEMPLATE_VERSION);
+
         function getUrlParameter(name) {
             name = name.replace(/[\[\]]/g, '\\$&');
             const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
@@ -207,6 +211,60 @@
             return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
         }
 
+        function processProducts(productsStr) {
+            if (!productsStr) return { products: [], totalAmount: 0, totalDiscount: 0, finalAmount: 0 };
+            
+            try {
+                const productGroups = productsStr.split('_a_');
+                if (productGroups.length !== 7) throw new Error("Sai cấu trúc dữ liệu");
+
+                const maSPs = productGroups[0].split('_b_');
+                const tenSPs = productGroups[1].split('_b_');
+                const slBans = productGroups[2].split('_b_');
+                const dvts = productGroups[3].split('_b_');
+                const donGias = productGroups[4].split('_b_');
+                const chietKhaus = productGroups[5].split('_b_');
+                
+                let totalAmount = 0;
+                let totalDiscount = 0;
+                const products = [];
+
+                for (let i = 0; i < maSPs.length; i++) {
+                    const soLuong = parseFloat(slBans[i] || 0);
+                    const donGia = parseFloat(donGias[i] || 0);
+                    const chietKhauDonVi = parseFloat(chietKhaus[i] || 0);
+                    
+                    // CÁCH TÍNH MỚI THEO YÊU CẦU
+                    const thanhTien = soLuong * donGia; // SL x Đơn giá
+                    const chietKhauTong = soLuong * chietKhauDonVi; // SL x Chiết khấu đơn vị
+                    
+                    totalAmount += thanhTien;
+                    totalDiscount += chietKhauTong;
+
+                    products.push({
+                        stt: i + 1,
+                        maSP: decodeURIComponent(maSPs[i] || ''),
+                        tenSP: decodeURIComponent(tenSPs[i] || ''),
+                        slBan: soLuong,
+                        dvt: decodeURIComponent(dvts[i] || ''),
+                        donGia: donGia,
+                        chietKhau: chietKhauDonVi,
+                        thanhTien: thanhTien
+                    });
+                }
+
+                return {
+                    products,
+                    totalAmount,
+                    totalDiscount,
+                    finalAmount: totalAmount - totalDiscount
+                };
+            } catch (error) {
+                console.error("Lỗi xử lý sản phẩm:", error);
+                return { products: [], totalAmount: 0, totalDiscount: 0, finalAmount: 0 };
+            }
+        }
+
         function displayData() {
             try {
                 // Xử lý header
@@ -215,7 +273,6 @@
                     const header = JSON.parse(headerParam);
                     const lowerHeader = {};
                     
-                    // Chuẩn hóa tên trường về chữ thường
                     for (const key in header) {
                         lowerHeader[key.toLowerCase()] = header[key];
                     }
@@ -224,7 +281,7 @@
                     document.getElementById('order-date').textContent = lowerHeader.ngay || '';
                     document.getElementById('customer-phone').textContent = lowerHeader.dienthoai || '';
                     
-                    // HIỂN THỊ ĐỊA CHỈ KÈM THÔNG TIN THÊM TRONG NGOẶC ĐƠN
+                    // Hiển thị địa chỉ kèm thông tin thêm trong ngoặc đơn
                     const diaChiChinh = lowerHeader.diachi || '';
                     const thongTinThem = lowerHeader.thongtinthemdc || '';
                     document.getElementById('customer-address').textContent = 
@@ -243,51 +300,28 @@
 
                 // Xử lý sản phẩm
                 const productsParam = getUrlParameter('products') || '';
-                const productGroups = productsParam.split('_a_');
+                const { products, totalAmount, totalDiscount, finalAmount } = processProducts(productsParam);
                 const tbody = document.getElementById('product-body');
                 tbody.innerHTML = '';
                 
-                if (productGroups.length >= 7) {
-                    const maSPs = productGroups[0].split('_b_');
-                    const tenSPs = productGroups[1].split('_b_');
-                    const slBans = productGroups[2].split('_b_');
-                    const dvts = productGroups[3].split('_b_');
-                    const donGias = productGroups[4].split('_b_');
-                    const chietKhaus = productGroups[5].split('_b_');
-                    const thanhTiens = productGroups[6].split('_b_');
-                    
-                    let totalAmount = 0;
-                    let totalDiscount = 0;
-                    
-                    for (let i = 0; i < maSPs.length; i++) {
-                        const soLuong = parseFloat(slBans[i] || 0);
-                        const donGia = parseFloat(donGias[i] || 0);
-                        const chietKhauDonVi = parseFloat(chietKhaus[i] || 0);
-                        const thanhTien = parseFloat(thanhTiens[i] || 0);
-                        
-                        // TÍNH TOÁN CHIẾT KHẤU = SỐ LƯỢNG * CHIẾT KHẤU ĐƠN VỊ
-                        const chietKhauTong = soLuong * chietKhauDonVi;
-                        totalDiscount += chietKhauTong;
-                        totalAmount += thanhTien;
-                        
-                        tbody.innerHTML += `
-                            <tr>
-                                <td>${i + 1}</td>
-                                <td>${decodeURIComponent(maSPs[i] || '')}</td>
-                                <td style="text-align:left">${decodeURIComponent(tenSPs[i] || '')}</td>
-                                <td>${soLuong}</td>
-                                <td>${decodeURIComponent(dvts[i] || '')}</td>
-                                <td>${formatCurrency(donGia)}</td>
-                                <td>${formatCurrency(chietKhauDonVi)}</td>
-                                <td>${formatCurrency(thanhTien)}</td>
-                            </tr>`;
-                    }
-                    
-                    // Cập nhật tổng cộng
-                    document.getElementById('total-amount').textContent = formatCurrency(totalAmount).replace(' đ', '');
-                    document.getElementById('total-discount').textContent = formatCurrency(totalDiscount).replace(' đ', '');
-                    document.getElementById('final-amount').textContent = formatCurrency(totalAmount - totalDiscount).replace(' đ', '');
-                }
+                products.forEach(product => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${product.stt}</td>
+                            <td>${product.maSP}</td>
+                            <td style="text-align:left">${product.tenSP}</td>
+                            <td>${product.slBan}</td>
+                            <td>${product.dvt}</td>
+                            <td>${formatCurrency(product.donGia)}</td>
+                            <td>${formatCurrency(product.chietKhau)}</td>
+                            <td>${formatCurrency(product.thanhTien)}</td>
+                        </tr>`;
+                });
+
+                // Cập nhật tổng cộng
+                document.getElementById('total-amount').textContent = formatCurrency(totalAmount).replace(' đ', '');
+                document.getElementById('total-discount').textContent = formatCurrency(totalDiscount).replace(' đ', '');
+                document.getElementById('final-amount').textContent = formatCurrency(finalAmount).replace(' đ', '');
 
                 // Tự động in
                 if (getUrlParameter('print') === 'true') {
