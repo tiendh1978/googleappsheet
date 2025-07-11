@@ -52,8 +52,8 @@
             margin-bottom: 2px;
         }
         .qr-code {
-            width: 110px;
-            height: 110px;
+            width: 100px;
+            height: 100px;
             object-fit: contain;
         }
         .invoice-title {
@@ -110,8 +110,8 @@
                 print-color-adjust: exact;
             }
             .qr-code {
-                width: 110px !important;
-                height: 110px !important;
+                width: 100px !important;
+                height: 100px !important;
             }
         }
     </style>
@@ -223,7 +223,12 @@
                     document.getElementById('order-code').textContent = lowerHeader.madonhang || '';
                     document.getElementById('order-date').textContent = lowerHeader.ngay || '';
                     document.getElementById('customer-phone').textContent = lowerHeader.dienthoai || '';
-                    document.getElementById('customer-address').textContent = lowerHeader.diachi || '';
+                    
+                    // HIỂN THỊ ĐỊA CHỈ KÈM THÔNG TIN THÊM TRONG NGOẶC ĐƠN
+                    const diaChiChinh = lowerHeader.diachi || '';
+                    const thongTinThem = lowerHeader.thongtinthemdc || '';
+                    document.getElementById('customer-address').textContent = 
+                        diaChiChinh + (thongTinThem ? " (" + thongTinThem + ")" : "");
                     
                     // Các trường mới
                     document.getElementById('last-pickup-date').textContent = lowerHeader.lanlaytruoc || '';
