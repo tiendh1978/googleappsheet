@@ -52,8 +52,8 @@
             margin-bottom: 2px;
         }
         .qr-code {
-            width: 97.5px;
-            height: 97.5px;
+            width: 110px;
+            height: 110px;
             object-fit: contain;
         }
         .invoice-title {
@@ -109,6 +109,10 @@
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
+            .qr-code {
+                width: 110px !important;
+                height: 110px !important;
+            }
         }
     </style>
 </head>
@@ -158,7 +162,7 @@
                     <th width="8%">SL</th>
                     <th width="8%">ĐVT</th>
                     <th width="12%">Đơn giá</th>
-                    <th width="12%">Chiết khấu</th>
+                    <th width="12%">Chiết khấu (đơn vị)</th>
                     <th width="12%">Thành tiền</th>
                 </tr>
             </thead>
@@ -251,20 +255,25 @@
                     let totalDiscount = 0;
                     
                     for (let i = 0; i < maSPs.length; i++) {
+                        const soLuong = parseFloat(slBans[i] || 0);
+                        const donGia = parseFloat(donGias[i] || 0);
+                        const chietKhauDonVi = parseFloat(chietKhaus[i] || 0);
                         const thanhTien = parseFloat(thanhTiens[i] || 0);
-                        const chietKhau = parseFloat(chietKhaus[i] || 0);
+                        
+                        // TÍNH TOÁN CHIẾT KHẤU = SỐ LƯỢNG * CHIẾT KHẤU ĐƠN VỊ
+                        const chietKhauTong = soLuong * chietKhauDonVi;
+                        totalDiscount += chietKhauTong;
                         totalAmount += thanhTien;
-                        totalDiscount += chietKhau;
                         
                         tbody.innerHTML += `
                             <tr>
                                 <td>${i + 1}</td>
                                 <td>${decodeURIComponent(maSPs[i] || '')}</td>
                                 <td style="text-align:left">${decodeURIComponent(tenSPs[i] || '')}</td>
-                                <td>${slBans[i] || '0'}</td>
+                                <td>${soLuong}</td>
                                 <td>${decodeURIComponent(dvts[i] || '')}</td>
-                                <td>${formatCurrency(parseFloat(donGias[i] || 0))}</td>
-                                <td>${formatCurrency(chietKhau)}</td>
+                                <td>${formatCurrency(donGia)}</td>
+                                <td>${formatCurrency(chietKhauDonVi)}</td>
                                 <td>${formatCurrency(thanhTien)}</td>
                             </tr>`;
                     }
