@@ -15,8 +15,8 @@
         body {
             background-color: #f5f5f5;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            justify-content: flex-start; /* Đổi từ center thành flex-start để căn top */
+            align-items: flex-start; /* Căn theo top */
             min-height: 100vh;
             margin: 2mm;
         }
@@ -52,8 +52,8 @@
             margin-bottom: 2px;
         }
         .qr-code {
-            width: 100px;
-            height: 100px;
+            width: 130px; /* Tăng từ 100px lên 130px */
+            height: 130px; /* Tăng từ 100px lên 130px */
             object-fit: contain;
         }
         .invoice-title {
@@ -67,7 +67,7 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 3px;
-            font-size: 11px;
+            font-size: 12.5px; /* Tăng từ 11px lên 12.5px */
         }
         .product-table {
             width: 100%;
@@ -77,11 +77,12 @@
             table-layout: fixed;
         }
         .product-table th {
-            background-color: #0066cc;
-            color: white;
+            background-color: white; /* Bỏ màu nền */
+            color: black; /* Đổi màu chữ từ trắng sang đen */
             padding: 2px;
             text-align: center;
             border: 1px solid #ddd;
+            font-weight: bold; /* Giữ in đậm cho tiêu đề */
         }
         .product-table td {
             border: 1px solid #ddd;
@@ -99,6 +100,12 @@
             margin-top: 5px;
             font-size: 11px;
         }
+        .address-line {
+            font-size: 12.5px;
+            font-weight: bold;
+            text-transform: uppercase; /* Chuyển thành chữ hoa */
+            margin-bottom: 2px;
+        }
         @media print {
             @page {
                 size: A5 landscape;
@@ -108,10 +115,11 @@
                 background: none;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
+                align-items: flex-start; /* Căn top khi in */
             }
             .qr-code {
-                width: 100px !important;
-                height: 100px !important;
+                width: 130px !important;
+                height: 130px !important;
             }
         }
     </style>
@@ -149,7 +157,7 @@
             <div><strong>Tổng Lần Lấy:</strong> <span id="total-pickups"></span></div>
         </div>
         
-        <div style="margin-bottom:2px;font-size:11px">
+        <div style="margin-bottom:2px;" class="address-line">
             <div><strong>Địa chỉ:</strong> <span id="customer-address"></span></div>
         </div>
         
@@ -216,7 +224,7 @@
             
             try {
                 const productGroups = productsStr.split('_a_');
-                if (productGroups.length !== 7) throw new Error("Sai cấu trúc dữ liệu");
+                if (productGroups.length !== 7) throw new Error("Sai cấu trúc dữ lệu");
 
                 const maSPs = productGroups[0].split('_b_');
                 const tenSPs = productGroups[1].split('_b_');
