@@ -15,7 +15,7 @@
         body {
             background-color: #f5f5f5;
             display: flex;
-            justify-content: flex-start;
+            justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
             margin: 2mm;
@@ -39,7 +39,7 @@
         }
         .bank-info {
             width: 25%;
-            font-size: 13.2px; /* Giảm 20% từ 16.5px */
+            font-size: 11px;
             padding-left: 1mm;
         }
         .company-info {
@@ -47,11 +47,18 @@
             text-align: center;
         }
         .company-name {
-            font-size: 19.2px; /* Giảm 20% từ 24px */
+            font-size: 20.8px; /* Tăng 30% từ 16px lên 20.8px */
             font-weight: bold;
             text-transform: uppercase;
             color: #0066cc;
             margin-bottom: 2px;
+        }
+        .invoice-title-above-line {
+            font-size: 20.8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            margin: 0 0 3px 0;
         }
         .qr-container {
             width: 25%;
@@ -59,34 +66,25 @@
             justify-content: flex-end;
         }
         .qr-code {
-            width: 130px;
-            height: 130px;
+            width: 100px;
+            height: 100px;
             object-fit: contain;
-        }
-        .invoice-title {
-            font-size: 24px;
-            font-weight: bold;
-            text-transform: uppercase;
-            text-align: center;
-            margin-top: 3px;
-            margin-bottom: 0;
-            padding-bottom: 3px;
         }
         .order-info, .additional-info {
             display: flex;
             justify-content: space-between;
             margin-bottom: 3px;
-            font-size: 12.5px;
+            font-size: 11px;
         }
         .product-table {
             width: 100%;
             border-collapse: collapse;
             margin: 5px 0;
-            font-size: 12.5px;
+            font-size: 12px;
             table-layout: fixed;
         }
         .product-table th {
-            background-color: white;
+            background-color: white; /* Đã bỏ màu xanh */
             color: black;
             padding: 2px;
             text-align: center;
@@ -110,7 +108,7 @@
             font-size: 11px;
         }
         .address-line {
-            font-size: 12.5px;
+            font-size: 11px;
             font-weight: bold;
             text-transform: uppercase;
             margin-bottom: 2px;
@@ -124,11 +122,10 @@
                 background: none;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
-                align-items: flex-start;
             }
             .qr-code {
-                width: 130px !important;
-                height: 130px !important;
+                width: 100px !important;
+                height: 100px !important;
             }
         }
     </style>
@@ -145,16 +142,17 @@
                 </div>
                 <div class="company-info">
                     <div class="company-name">CÔNG TY TNHH TRUNG KHẢI</div>
-                    <div style="font-weight:bold;font-size:14.4px">TỔNG ĐẠI LÝ PHÂN PHỐI NƯỚC</div>
-                    <div style="font-size:13.2px">ĐT: 0334 35 3993 - 0971 60 1771</div>
+                    <div style="font-weight:bold;font-size:12px">TỔNG ĐẠI LÝ PHÂN PHỐI NƯỚC</div>
+                    <div style="font-size:11px">ĐT: 0334 35 3993 - 0971 60 1771</div>
                 </div>
                 <div class="qr-container">
                     <img id="qr-code-img" src="" alt="QR Code" class="qr-code">
                 </div>
             </div>
-            <div class="invoice-title">HÓA ĐƠN BÁN HÀNG</div>
+            <div class="invoice-title-above-line">HÓA ĐƠN BÁN HÀNG</div>
         </div>
         
+        <!-- Các phần còn lại giữ nguyên -->
         <div class="order-info">
             <div><strong>Mã đơn hàng:</strong> <span id="order-code"></span></div>
             <div><strong>Ngày:</strong> <span id="order-date"></span></div>
@@ -213,7 +211,7 @@
 
     <script>
         // Phiên bản template
-        const TEMPLATE_VERSION = "2024-07-12-v3";
+        const TEMPLATE_VERSION = "2024-07-12-v1-adjusted";
         console.log("Template version:", TEMPLATE_VERSION);
 
         function getUrlParameter(name) {
@@ -234,7 +232,7 @@
             
             try {
                 const productGroups = productsStr.split('_a_');
-                if (productGroups.length !== 7) throw new Error("Sai cấu trúc dữ lệu");
+                if (productGroups.length !== 7) throw new Error("Sai cấu trúc dữ liệu");
 
                 const maSPs = productGroups[0].split('_b_');
                 const tenSPs = productGroups[1].split('_b_');
@@ -252,9 +250,8 @@
                     const donGia = parseFloat(donGias[i] || 0);
                     const chietKhauDonVi = parseFloat(chietKhaus[i] || 0);
                     
-                    // CÁCH TÍNH MỚI THEO YÊU CẦU
-                    const thanhTien = soLuong * donGia; // SL x Đơn giá
-                    const chietKhauTong = soLuong * chietKhauDonVi; // SL x Chiết khấu đơn vị
+                    const thanhTien = soLuong * donGia;
+                    const chietKhauTong = soLuong * chietKhauDonVi;
                     
                     totalAmount += thanhTien;
                     totalDiscount += chietKhauTong;
