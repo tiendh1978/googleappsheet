@@ -75,8 +75,8 @@
             justify-content: flex-end;
         }
         .qr-code {
-            width: 140px;
-            height: 140px;
+            width: 130px;
+            height: 130px;
             object-fit: contain;
         }
         .order-info, .additional-info {
@@ -220,7 +220,7 @@
 
     <script>
         // Phiên bản template
-        const TEMPLATE_VERSION = "2024-07-22-tightened-layout-2";
+        const TEMPLATE_VERSION = "2024-07-22-phone-numbers-update"; // Đổi tên phiên bản để dễ theo dõi
         console.log("Template version:", TEMPLATE_VERSION);
 
         function getUrlParameter(name) {
@@ -303,7 +303,21 @@
 
                     document.getElementById('order-code').textContent = lowerHeader.madonhang || '';
                     document.getElementById('order-date').textContent = lowerHeader.ngay || '';
-                    document.getElementById('customer-phone').textContent = lowerHeader.dienthoai || '';
+                    
+                    // Lấy các số điện thoại
+                    const dienThoai1 = lowerHeader.dienthoai || '';
+                    const dienThoai2 = lowerHeader.dienthoai2 || '';
+                    const dienThoai3 = lowerHeader.dienthoai3 || '';
+
+                    // Xây dựng chuỗi số điện thoại, phân cách bằng "/" và chỉ thêm nếu có dữ liệu
+                    let fullPhoneString = dienThoai1;
+                    if (dienThoai2) {
+                        fullPhoneString += " / " + dienThoai2;
+                    }
+                    if (dienThoai3) {
+                        fullPhoneString += " / " + dienThoai3;
+                    }
+                    document.getElementById('customer-phone').textContent = fullPhoneString;
 
                     // Hiển thị địa chỉ kèm thông tin thêm trong ngoặc đơn
                     const diaChiChinh = lowerHeader.diachi || '';
@@ -322,7 +336,7 @@
                     }
                 }
 
-                // Xử lý sản phẩm
+                // Xử lý sản phẩm (Không thay đổi)
                 const productsParam = getUrlParameter('products') || '';
                 const { products, totalAmount, totalDiscount, finalAmount } = processProducts(productsParam);
                 const tbody = document.getElementById('product-body');
@@ -342,12 +356,12 @@
                                 </tr>`;
                 });
 
-                // Cập nhật tổng cộng
+                // Cập nhật tổng cộng (Không thay đổi)
                 document.getElementById('total-amount').textContent = formatCurrency(totalAmount).replace(' đ', '');
                 document.getElementById('total-discount').textContent = formatCurrency(totalDiscount).replace(' đ', '');
                 document.getElementById('final-amount').textContent = formatCurrency(finalAmount).replace(' đ', '');
 
-                // Tự động in
+                // Tự động in (Không thay đổi)
                 if (getUrlParameter('print') === 'true') {
                     setTimeout(window.print, 500);
                 }
@@ -357,7 +371,7 @@
             }
         }
 
-        // Chạy khi trang tải xong
+        // Chạy khi trang tải xong (Không thay đổi)
         document.addEventListener('DOMContentLoaded', displayData);
     </script>
 </body>
