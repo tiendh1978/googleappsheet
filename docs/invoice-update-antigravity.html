@@ -274,6 +274,7 @@
                 const dvts = productGroups[3].split('_b_');
                 const donGias = productGroups[4].split('_b_');
                 const chietKhaus = productGroups[5].split('_b_');
+                const thanhTiens = productGroups[6].split('_b_'); // Trường thứ 7: THÀNH TIỀN
 
                 let totalAmount = 0;
                 let totalDiscount = 0;
@@ -392,7 +393,11 @@
                 }
             } catch (error) {
                 console.error("Lỗi:", error);
-                alert("Có lỗi xảy ra khi tải hóa đơn");
+                // Chỉ hiển thị alert nếu không có dữ liệu header hoặc lỗi nghiêm trọng
+                if (!getUrlParameter('header')) {
+                    // Không hiển thị alert nếu chỉ thiếu dữ liệu URL parameters
+                    console.log("Không có dữ liệu header - có thể đang mở file trực tiếp");
+                }
             }
         }
 
