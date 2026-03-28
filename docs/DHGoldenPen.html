@@ -398,13 +398,28 @@
             const maDon = orderData.MaDonHang || 'Moi';
             const fileName = `DonDatHang_${maDon}.pdf`;
 
+            // Cấu hình tối ưu cho html2pdf
             const opt = {
-                margin: [10, 0, 10, 0],
-                filename: fileName,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, windowWidth: 794 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                margin:       [10, 10, 10, 10], // Lề: trên, phải, dưới, trái (mm)
+                filename:     fileName,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2, // Tăng độ nét
+                    useCORS: true, // Cho phép tải ảnh từ nguồn khác (nếu có)
+                    letterRendering: true,
+                    // Bắt buộc html2canvas render theo đúng chiều rộng của tờ A4 (210mm ~ 794px ở 96dpi)
+                    windowWidth: 794 
+                },
+                jsPDF:        { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait' 
+                }
             };
+
+            // Thực hiện xuất PDF
+            html2pdf().set(opt).from(element).save();
+        }
 
             html2pdf().set(opt).from(element).save();
         }
