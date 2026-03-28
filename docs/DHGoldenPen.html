@@ -302,16 +302,16 @@
                                             </p>
                                             <div class="relative">
                                                 <pre class="bg-gray-800 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto" id="code-action">CONCATENATE(
-  "https://[TEN-GITHUB-CUA-BAN].github.io/[TEN-REPO-CUA-BAN]/?",
+  "https://tiendh1978.github.io/googleappsheet/DHGoldenPen.html?",
   "MaDonHang=", ENCODEURL([MaDonHang]),
   "&Ngay=", ENCODEURL([Ngay]),
-  "&TenKhachHang=", ENCODEURL([TenKhachHang].[Tên Khách Hàng]),
+  "&TenKhachHang=", ENCODEURL([TenKhachHang].[TenKhachHang]),
   "&DiaChi=", ENCODEURL([DiaChi]),
   "&NhanVien=", ENCODEURL([NVKDID]),
   "&GhiChu=", ENCODEURL([GhiChu]),
   "&CKTM=", ENCODEURL([CKThuongMai]),
   "&CKKM=", ENCODEURL([CKKhuyenMai]),
-  "&TongTien=", ENCODEURL([Tổng tiền]),
+  "&TongTien=", ENCODEURL([TongTienHang]),
   "&items=", ENCODEURL(
     "[" & 
     SUBSTITUTE(TEXT(SELECT(DON_HANG_CT[JSON_String], [DHID] = [_THISROW].[ID])), " , ", ",") 
@@ -320,9 +320,6 @@
 )</pre>
                                                 <button onclick="copyToClipboard('code-action', this)" class="absolute top-2 right-2 p-2 bg-gray-700 hover:bg-gray-600 rounded text-white transition-colors text-xs">Copy</button>
                                             </div>
-                                            <p class="text-xs text-red-500 mt-2 italic">
-                                                * Chú ý: Hãy thay đoạn link GitHub bằng link thực tế của bạn sau khi up file này lên GitHub Pages.
-                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -418,9 +415,6 @@
             };
 
             // Thực hiện xuất PDF
-            html2pdf().set(opt).from(element).save();
-        }
-
             html2pdf().set(opt).from(element).save();
         }
 
