@@ -390,48 +390,63 @@
         // Hàm tải PDF (ĐÃ ĐƯỢC FIX LỖI LỆCH TRÊN PC)
        // Hàm tải PDF (ĐÃ FIX LỖI LỆCH TRÁI TRÊN PC)
         function downloadPDF() {
-            const element = document.getElementById('invoice-content');
-            if (!element) return;
-            
-            const maDon = orderData.MaDonHang || 'Moi';
-            const fileName = `DonDatHang_${maDon}.pdf`;
+    const element = document.getElementById('invoice-content');
+    if (!element) return;
 
-            // Cấu hình tối ưu cho html2pdf
-            const opt = {
-                margin:       0, 
-                filename:     fileName,
-                image:        { type: 'jpeg', quality: 1 },
-                html2canvas:  { 
-                    scale: 2, 
-                    useCORS: true, 
-                    letterRendering: true,
-                    // Ép tọa độ chụp về góc trên cùng bên trái
-                    scrollX: 0,
-                    scrollY: 0,
-                    windowWidth: 794,
-                    // CHÌA KHÓA TRỊ BỆNH ĐÂY ANH: 
-                    // Can thiệp vào bản sao (clone) trước khi chụp, ép nó sát lề trái tọa độ 0,0
-                    onclone: function (clonedDoc) {
-                        const el = clonedDoc.getElementById('invoice-content');
-                        if (el) {
-                            el.classList.remove('mx-auto'); // Xóa lệnh căn giữa
-                            el.style.margin = '0';
-                            el.style.position = 'absolute';
-                            el.style.left = '0';
-                            el.style.top = '0';
-                        }
-                    }
-                },
-                jsPDF:        { 
-                    unit: 'mm', 
-                    format: 'a4', 
-                    orientation: 'portrait' 
+    const maDon = orderData.MaDonHang || 'Moi';
+    const fileName = `DonDatHang_${maDon}.pdf`;
+
+    // Kích thước A4 chuẩn ở 96 DPI
+    const A4_WIDTH_PX = 794;
+    const A4_HEIGHT_PX = 1123;
+
+    const opt = {
+        margin: 0,
+        filename: fileName,
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: {
+            scale: 2,
+            useCORS: true,
+            letterRendering: true,
+            scrollX: 0,
+            scrollY: 0,
+            windowWidth: A4_WIDTH_PX,
+            windowHeight: A4_HEIGHT_PX,
+            onclone: function (clonedDoc, elementClone) {
+                // Tìm phần tử #invoice-content trong bản clone
+                const el = clonedDoc.getElementById('invoice-content');
+                if (el) {
+                    // Loại bỏ mọi margin/padding gốc, set width cứng bằng px
+                    el.style.margin = '0';
+                    el.style.padding = '0';
+                    el.style.width = `${A4_WIDTH_PX}px`;
+                    el.style.minHeight = `${A4_HEIGHT_PX}px`;
+                    el.style.position = 'absolute';
+                    el.style.left = '0';
+                    el.style.top = '0';
+                    el.style.boxSizing = 'border-box';
+                    
+                    // Chuyển đổi padding từ mm sang px (1mm ≈ 3.779px)
+                    const paddingTop = 15 * 3.779;   // 15mm -> ~56.7px
+                    const paddingRight = 20 * 3.779; // 20mm -> ~75.6px
+                    const paddingBottom = 15 * 3.779;
+                    const paddingLeft = 20 * 3.779;
+                    el.style.padding = `${paddingTop}px ${paddingRight}px ${paddingBottom}px ${paddingLeft}px`;
+                    
+                    // Đảm bảo tất cả nội dung bên trong không bị scale
+                    el.style.transform = 'none';
                 }
-            };
-
-            // Thực hiện xuất PDF
-            html2pdf().set(opt).from(element).save();
+            }
+        },
+        jsPDF: {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait'
         }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
 
         // Chạy ứng dụng
         init();
