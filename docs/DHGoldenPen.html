@@ -14,11 +14,6 @@
             body { background: white; }
             .print-hide { display: none !important; }
         }
-        /* Đảm bảo thanh cuộn ngang trên mobile cho mượt, không làm bóp méo khung A4 */
-        .mobile-scroll {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -129,7 +124,7 @@
 
             return `
                 <div id="invoice-content" class="bg-white mx-auto print:m-0 print:shadow-none shadow-2xl relative" 
-                     style="width: 794px; min-height: 1123px; padding: 15mm 20mm; font-family: 'Times New Roman', Times, serif; color: #000; box-sizing: border-box; font-size: 14px;">
+                     style="width: 210mm; min-height: 297mm; padding: 15mm 20mm; font-family: 'Times New Roman', Times, serif; color: #000; box-sizing: border-box; font-size: 14px;">
                     
                     <!-- Header -->
                     <div class="flex justify-between items-start border-b-2 border-gray-800 pb-4 mb-6">
@@ -195,15 +190,15 @@
                         </table>
                     </div>
 
-                    <!-- Table (Đã thêm table-layout: fixed và chia % cột) -->
-                    <table class="w-full border-collapse border border-gray-800 text-sm mb-4" style="table-layout: fixed; word-wrap: break-word;">
+                    <!-- Table -->
+                    <table class="w-full border-collapse border border-gray-800 text-sm mb-4">
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 8%;">STT</th>
-                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 20%;">Mã vật tư</th>
-                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 42%;">Tên hàng</th>
-                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 10%;">%CK</th>
-                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 20%;">Số lượng</th>
+                                <th class="border border-gray-800 p-2 text-center w-12 font-bold">STT</th>
+                                <th class="border border-gray-800 p-2 text-center w-24 font-bold">Mã vật tư</th>
+                                <th class="border border-gray-800 p-2 text-center font-bold">Tên hàng</th>
+                                <th class="border border-gray-800 p-2 text-center w-16 font-bold">%CK</th>
+                                <th class="border border-gray-800 p-2 text-center w-24 font-bold">Số lượng</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -356,9 +351,9 @@
                 `;
             } else {
                 app.innerHTML = `
-                    <div class="min-h-screen bg-gray-200 py-8 print:py-0 print:bg-white mobile-scroll">
+                    <div class="min-h-screen bg-gray-200 py-8 print:py-0 print:bg-white">
                         <!-- Control Panel -->
-                        <div class="mx-auto mb-4 print-hide flex justify-between items-center bg-white p-4 rounded-lg shadow-sm" style="width: 794px;">
+                        <div class="max-w-[210mm] mx-auto mb-4 print-hide flex justify-between items-center bg-white p-4 rounded-lg shadow-sm">
                             <div class="text-sm text-gray-500">Sẵn sàng in (Khổ A4)</div>
                             <div class="flex gap-2">
                                 <button onclick="downloadPDF()" class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-colors font-medium">
@@ -370,7 +365,7 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-center" style="min-width: 794px;">
+                        <div class="flex justify-center">
                             ${invoiceHtml}
                         </div>
                     </div>
@@ -392,7 +387,7 @@
             });
         }
 
-        // Hàm tải PDF
+        // Hàm tải PDF (ĐÃ ĐƯỢC FIX LỖI LỆCH TRÊN PC)
         function downloadPDF() {
             const element = document.getElementById('invoice-content');
             if (!element) return;
@@ -402,14 +397,27 @@
 
             // Cấu hình tối ưu cho html2pdf
             const opt = {
-                margin:       0, // Đã set padding trong HTML nên margin PDF để = 0 tránh tràn viền
+                margin:       0, 
                 filename:     fileName,
                 image:        { type: 'jpeg', quality: 1 },
                 html2canvas:  { 
-                    scale: 2, // Tăng độ nét
-                    useCORS: true, // Cho phép tải ảnh từ nguồn khác (nếu có)
+                    scale: 2, 
+                    useCORS: true, 
                     letterRendering: true,
-                    windowWidth: 794 // Ép cứng width để không bị ảnh hưởng bởi màn hình điện thoại/PC
+                    scrollX: 0,
+                    scrollY: 0,
+                    // CHÌA KHÓA TRỊ BỆNH ĐÂY ANH: 
+                    // Can thiệp vào bản sao (clone) trước khi chụp, ép nó sát lề trái tọa độ 0,0
+                    onclone: function (clonedDoc) {
+                        const el = clonedDoc.getElementById('invoice-content');
+                        if (el) {
+                            el.style.margin = '0';
+                            el.style.position = 'absolute';
+                            el.style.left = '0';
+                            el.style.top = '0';
+                            el.classList.remove('mx-auto');
+                        }
+                    }
                 },
                 jsPDF:        { 
                     unit: 'mm', 
