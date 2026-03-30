@@ -388,6 +388,7 @@
         }
 
         // Hàm tải PDF (ĐÃ ĐƯỢC FIX LỖI LỆCH TRÊN PC)
+       // Hàm tải PDF (ĐÃ FIX LỖI LỆCH TRÁI TRÊN PC)
         function downloadPDF() {
             const element = document.getElementById('invoice-content');
             if (!element) return;
@@ -404,18 +405,20 @@
                     scale: 2, 
                     useCORS: true, 
                     letterRendering: true,
+                    // Ép tọa độ chụp về góc trên cùng bên trái
                     scrollX: 0,
                     scrollY: 0,
+                    windowWidth: 794,
                     // CHÌA KHÓA TRỊ BỆNH ĐÂY ANH: 
                     // Can thiệp vào bản sao (clone) trước khi chụp, ép nó sát lề trái tọa độ 0,0
                     onclone: function (clonedDoc) {
                         const el = clonedDoc.getElementById('invoice-content');
                         if (el) {
+                            el.classList.remove('mx-auto'); // Xóa lệnh căn giữa
                             el.style.margin = '0';
                             el.style.position = 'absolute';
                             el.style.left = '0';
                             el.style.top = '0';
-                            el.classList.remove('mx-auto');
                         }
                     }
                 },
