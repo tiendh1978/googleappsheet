@@ -10,9 +10,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @media print {
+            /* Set lề trang in bằng 0 để dùng padding của HTML */
             @page { size: A4 portrait; margin: 0; }
             body { background: white; }
             .print-hide { display: none !important; }
+            /* Ép thẻ chứa nội dung bung hết cỡ khi in, không bị giới hạn */
+            #invoice-content { 
+                width: 100% !important; 
+                max-width: none !important; 
+                box-shadow: none !important; 
+                margin: 0 !important;
+            }
+        }
+        .mobile-scroll {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
     </style>
 </head>
@@ -47,9 +59,7 @@
                     CKKM: "0",
                     TongTien: "25400000",
                     items: [
-                        { MaHang: "001-258", TenHang: "LR7-CX Ruột bút ký mực gel nét 0.7mm - Xanh", CK: "4", SoLuong: 576 },
-                        { MaHang: "001-305", TenHang: "LR10-CX Ruột bút mực gel nét 1.0mm màu xanh", CK: "4", SoLuong: 576 },
-                        { MaHang: "002-111", TenHang: "Bút bi bấm cao cấp vỏ kim loại", CK: "0", SoLuong: 100 },
+                        { MaHang: "007-001", TenHang: "1500-2B Chì Tiệp thân vàng", CK: "", SoLuong: 144 }
                     ]
                 };
             } else {
@@ -88,6 +98,7 @@
         function getInvoiceHTML() {
             const totalQuantity = orderData.items.reduce((sum, item) => sum + (Number(item.SoLuong) || 0), 0);
             
+            // Chỉ render đúng số lượng hàng có trong đơn, KHÔNG thêm dòng trống
             let itemsHtml = orderData.items.map((item, index) => `
                 <tr style="page-break-inside: avoid">
                     <td class="border border-gray-800 p-2 text-center">${index + 1}</td>
@@ -97,20 +108,6 @@
                     <td class="border border-gray-800 p-2 text-right font-semibold">${formatCurrency(Number(item.SoLuong) || 0)}</td>
                 </tr>
             `).join('');
-
-            // Thêm dòng trống cho đẹp nếu ít hàng
-            const emptyRowsCount = Math.max(0, 5 - orderData.items.length);
-            for(let i=0; i<emptyRowsCount; i++) {
-                itemsHtml += `
-                    <tr style="page-break-inside: avoid">
-                        <td class="border border-gray-800 p-2 text-center text-transparent">.</td>
-                        <td class="border border-gray-800 p-2"></td>
-                        <td class="border border-gray-800 p-2"></td>
-                        <td class="border border-gray-800 p-2"></td>
-                        <td class="border border-gray-800 p-2"></td>
-                    </tr>
-                `;
-            }
 
             let totalAmountHtml = '';
             if (orderData.TongTien) {
@@ -123,8 +120,8 @@
             }
 
             return `
-                <div id="invoice-content" class="bg-white mx-auto print:m-0 print:shadow-none shadow-2xl relative" 
-                     style="width: 210mm; min-height: 297mm; padding: 15mm 20mm; font-family: 'Times New Roman', Times, serif; color: #000; box-sizing: border-box; font-size: 14px;">
+                <div id="invoice-content" class="bg-white mx-auto shadow-2xl relative" 
+                     style="width: 794px; padding: 15mm 20mm; font-family: 'Times New Roman', Times, serif; color: #000; box-sizing: border-box; font-size: 14px;">
                     
                     <!-- Header -->
                     <div class="flex justify-between items-start border-b-2 border-gray-800 pb-4 mb-6">
@@ -191,14 +188,14 @@
                     </div>
 
                     <!-- Table -->
-                    <table class="w-full border-collapse border border-gray-800 text-sm mb-4">
+                    <table class="w-full border-collapse border border-gray-800 text-sm mb-4" style="table-layout: fixed; word-wrap: break-word;">
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="border border-gray-800 p-2 text-center w-12 font-bold">STT</th>
-                                <th class="border border-gray-800 p-2 text-center w-24 font-bold">Mã vật tư</th>
-                                <th class="border border-gray-800 p-2 text-center font-bold">Tên hàng</th>
-                                <th class="border border-gray-800 p-2 text-center w-16 font-bold">%CK</th>
-                                <th class="border border-gray-800 p-2 text-center w-24 font-bold">Số lượng</th>
+                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 8%;">STT</th>
+                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 20%;">Mã vật tư</th>
+                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 42%;">Tên hàng</th>
+                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 10%;">%CK</th>
+                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 20%;">Số lượng</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -262,66 +259,8 @@
                             <!-- Left Column: Instructions -->
                             <div class="space-y-6">
                                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                                    <div class="flex items-center gap-3 mb-4">
-                                        <h1 class="text-2xl font-bold text-gray-800">Cấu hình In AppSheet (Golden Pen)</h1>
-                                    </div>
-                                    <p class="text-gray-600 mb-6">
-                                        Làm theo 2 bước dưới đây để kết nối AppSheet của bạn với mẫu in A4 này trên GitHub.
-                                    </p>
-
-                                    <div class="space-y-6">
-                                        <!-- Step 1 -->
-                                        <div class="border-l-4 border-blue-500 pl-4">
-                                            <h3 class="font-bold text-lg text-gray-800 flex items-center gap-2">
-                                                <span class="bg-blue-100 text-blue-800 w-6 h-6 rounded-full flex items-center justify-center text-sm">1</span>
-                                                Tạo Virtual Column (Bảng DON_HANG_CT)
-                                            </h3>
-                                            <p class="text-sm text-gray-600 mt-1 mb-3">
-                                                Trong bảng <strong>DON_HANG_CT</strong>, tạo một Virtual Column tên là <code class="bg-gray-100 px-1 rounded text-red-600">JSON_String</code> với công thức:
-                                            </p>
-                                            <div class="relative">
-                                                <pre class="bg-gray-800 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto" id="code-vc">CONCATENATE(
-  '{"MaHang":"', [MaHang], 
-  '", "TenHang":"', [TenHang], 
-  '", "CK":"', [ChietKhauThuongMai], 
-  '", "SoLuong":', [SoLuong], 
-  '}'
-)</pre>
-                                                <button onclick="copyToClipboard('code-vc', this)" class="absolute top-2 right-2 p-2 bg-gray-700 hover:bg-gray-600 rounded text-white transition-colors text-xs">Copy</button>
-                                            </div>
-                                        </div>
-
-                                        <!-- Step 2 -->
-                                        <div class="border-l-4 border-green-500 pl-4">
-                                            <h3 class="font-bold text-lg text-gray-800 flex items-center gap-2">
-                                                <span class="bg-green-100 text-green-800 w-6 h-6 rounded-full flex items-center justify-center text-sm">2</span>
-                                                Tạo Action "Go to a website" (Bảng DON_HANG)
-                                            </h3>
-                                            <p class="text-sm text-gray-600 mt-1 mb-3">
-                                                Trong bảng <strong>DON_HANG</strong>, tạo Action kiểu <em>Go to a website</em> và dán công thức sau vào ô Target:
-                                            </p>
-                                            <div class="relative">
-                                                <pre class="bg-gray-800 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto" id="code-action">CONCATENATE(
-  "https://tiendh1978.github.io/googleappsheet/DHGoldenPen.html?",
-  "MaDonHang=", ENCODEURL([MaDonHang]),
-  "&Ngay=", ENCODEURL([Ngay]),
-  "&TenKhachHang=", ENCODEURL([TenKhachHang].[TenKhachHang]),
-  "&DiaChi=", ENCODEURL([DiaChi]),
-  "&NhanVien=", ENCODEURL([NVKDID]),
-  "&GhiChu=", ENCODEURL([GhiChu]),
-  "&CKTM=", ENCODEURL([CKThuongMai]),
-  "&CKKM=", ENCODEURL([CKKhuyenMai]),
-  "&TongTien=", ENCODEURL([TongTienHang]),
-  "&items=", ENCODEURL(
-    "[" & 
-    SUBSTITUTE(TEXT(SELECT(DON_HANG_CT[JSON_String], [DHID] = [_THISROW].[ID])), " , ", ",") 
-    & "]"
-  )
-)</pre>
-                                                <button onclick="copyToClipboard('code-action', this)" class="absolute top-2 right-2 p-2 bg-gray-700 hover:bg-gray-600 rounded text-white transition-colors text-xs">Copy</button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <h1 class="text-2xl font-bold text-gray-800 mb-4">Cấu hình In AppSheet</h1>
+                                    <p class="text-gray-600">Mở link từ AppSheet để xem dữ liệu thật.</p>
                                 </div>
                             </div>
 
@@ -351,10 +290,10 @@
                 `;
             } else {
                 app.innerHTML = `
-                    <div class="min-h-screen bg-gray-200 py-8 print:py-0 print:bg-white">
+                    <div class="min-h-screen bg-gray-200 py-8 print:py-0 print:bg-white mobile-scroll">
                         <!-- Control Panel -->
-                        <div class="max-w-[210mm] mx-auto mb-4 print-hide flex justify-between items-center bg-white p-4 rounded-lg shadow-sm">
-                            <div class="text-sm text-gray-500">Sẵn sàng in (Khổ A4)</div>
+                        <div class="mx-auto mb-4 print-hide flex justify-between items-center bg-white p-4 rounded-lg shadow-sm" style="max-width: 794px;">
+                            <div class="text-sm text-gray-500 font-medium">Sẵn sàng in (Khổ A4)</div>
                             <div class="flex gap-2">
                                 <button onclick="downloadPDF()" class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-colors font-medium">
                                     Tải PDF
@@ -365,7 +304,7 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-center">
+                        <div class="flex justify-center" style="min-width: 794px;">
                             ${invoiceHtml}
                         </div>
                     </div>
@@ -373,80 +312,46 @@
             }
         }
 
-        // Hàm Copy
-        function copyToClipboard(elementId, btn) {
-            const text = document.getElementById(elementId).innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                const originalText = btn.innerText;
-                btn.innerText = 'Đã copy!';
-                btn.classList.add('text-green-400');
-                setTimeout(() => {
-                    btn.innerText = originalText;
-                    btn.classList.remove('text-green-400');
-                }, 2000);
-            });
-        }
-
-        // Hàm tải PDF (ĐÃ ĐƯỢC FIX LỖI LỆCH TRÊN PC)
-       // Hàm tải PDF (ĐÃ FIX LỖI LỆCH TRÁI TRÊN PC)
+        // Hàm tải PDF (Đã fix lỗi lệch trái trên PC, giữ nguyên độ mượt trên Mobile)
         function downloadPDF() {
-    const element = document.getElementById('invoice-content');
-    if (!element) return;
+            const element = document.getElementById('invoice-content');
+            if (!element) return;
+            
+            const maDon = orderData.MaDonHang || 'Moi';
+            const fileName = `DonDatHang_${maDon}.pdf`;
 
-    const maDon = orderData.MaDonHang || 'Moi';
-    const fileName = `DonDatHang_${maDon}.pdf`;
-
-    // Kích thước A4 chuẩn ở 96 DPI
-    const A4_WIDTH_PX = 794;
-    const A4_HEIGHT_PX = 1123;
-
-    const opt = {
-        margin: 0,
-        filename: fileName,
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: {
-            scale: 2,
-            useCORS: true,
-            letterRendering: true,
-            scrollX: 0,
-            scrollY: 0,
-            windowWidth: A4_WIDTH_PX,
-            windowHeight: A4_HEIGHT_PX,
-            onclone: function (clonedDoc, elementClone) {
-                // Tìm phần tử #invoice-content trong bản clone
-                const el = clonedDoc.getElementById('invoice-content');
-                if (el) {
-                    // Loại bỏ mọi margin/padding gốc, set width cứng bằng px
-                    el.style.margin = '0';
-                    el.style.padding = '0';
-                    el.style.width = `${A4_WIDTH_PX}px`;
-                    el.style.minHeight = `${A4_HEIGHT_PX}px`;
-                    el.style.position = 'absolute';
-                    el.style.left = '0';
-                    el.style.top = '0';
-                    el.style.boxSizing = 'border-box';
-                    
-                    // Chuyển đổi padding từ mm sang px (1mm ≈ 3.779px)
-                    const paddingTop = 15 * 3.779;   // 15mm -> ~56.7px
-                    const paddingRight = 20 * 3.779; // 20mm -> ~75.6px
-                    const paddingBottom = 15 * 3.779;
-                    const paddingLeft = 20 * 3.779;
-                    el.style.padding = `${paddingTop}px ${paddingRight}px ${paddingBottom}px ${paddingLeft}px`;
-                    
-                    // Đảm bảo tất cả nội dung bên trong không bị scale
-                    el.style.transform = 'none';
+            const opt = {
+                margin:       0, 
+                filename:     fileName,
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    letterRendering: true,
+                    scrollX: 0,
+                    scrollY: 0,
+                    windowWidth: 794,
+                    // Ép tọa độ chụp về góc trên cùng bên trái để không bị cắt lề trên PC
+                    onclone: function (clonedDoc) {
+                        const el = clonedDoc.getElementById('invoice-content');
+                        if (el) {
+                            el.classList.remove('mx-auto');
+                            el.style.margin = '0';
+                            el.style.position = 'absolute';
+                            el.style.left = '0';
+                            el.style.top = '0';
+                        }
+                    }
+                },
+                jsPDF:        { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait' 
                 }
-            }
-        },
-        jsPDF: {
-            unit: 'mm',
-            format: 'a4',
-            orientation: 'portrait'
-        }
-    };
+            };
 
-    html2pdf().set(opt).from(element).save();
-}
+            html2pdf().set(opt).from(element).save();
+        }
 
         // Chạy ứng dụng
         init();
