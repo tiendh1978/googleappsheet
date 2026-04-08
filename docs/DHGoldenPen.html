@@ -55,11 +55,11 @@
                     DiaChi: "26 Đường Cao Lỗ, Tổ 4 Thị trấn Đông Anh",
                     NhanVien: "Nguyễn Văn A",
                     GhiChu: "Giao hàng trong giờ hành chính",
-                    CKTM: "4",
+                    CKTM: "0.04",
                     CKKM: "0",
                     TongTien: "25400000",
                     items: [
-                        { MaHang: "007-001", TenHang: "1500-2B Chì Tiệp thân vàng", CK: "", SoLuong: 144 }
+                        { MaHang: "007-001", Barcode: "8935001234567", TenHang: "1500-2B Chì Tiệp thân vàng", CK: "0.1", SoLuong: 144 }
                     ]
                 };
             } else {
@@ -103,21 +103,12 @@
                 <tr style="page-break-inside: avoid">
                     <td class="border border-gray-800 p-2 text-center">${index + 1}</td>
                     <td class="border border-gray-800 p-2 text-center">${item.MaHang || ''}</td>
+                    <td class="border border-gray-800 p-2 text-center">${item.Barcode || ''}</td>
                     <td class="border border-gray-800 p-2">${item.TenHang || ''}</td>
-                    <td class="border border-gray-800 p-2 text-center">${item.CK ? item.CK + '%' : ''}</td>
+                    <td class="border border-gray-800 p-2 text-center">${item.CK ? (Number(item.CK) * 100) + '%' : ''}</td>
                     <td class="border border-gray-800 p-2 text-right font-semibold">${formatCurrency(Number(item.SoLuong) || 0)}</td>
                 </tr>
             `).join('');
-
-            let totalAmountHtml = '';
-            if (orderData.TongTien) {
-                totalAmountHtml = `
-                    <tr class="font-bold bg-gray-50" style="page-break-inside: avoid">
-                        <td colspan="4" class="border border-gray-800 p-2 text-right uppercase">Tổng tiền thanh toán:</td>
-                        <td class="border border-gray-800 p-2 text-right text-red-600 text-base">${formatCurrency(Number(orderData.TongTien))} đ</td>
-                    </tr>
-                `;
-            }
 
             return `
                 <div id="invoice-content" class="bg-white mx-auto shadow-2xl relative" 
@@ -125,27 +116,8 @@
                     
                     <!-- Header -->
                     <div class="flex justify-between items-start border-b-2 border-gray-800 pb-4 mb-6">
-                        <div class="flex items-center">
-                            <div class="w-20 h-20 flex-shrink-0 flex flex-col items-center justify-center mr-4">
-                                <div class="relative w-14 h-14">
-                                    <div class="absolute inset-0 border-4 border-orange-500 rounded-full border-t-transparent transform -rotate-45"></div>
-                                    <div class="absolute inset-1 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xl">G</div>
-                                </div>
-                                <div class="text-orange-600 font-bold text-xs mt-1 tracking-wider">Golden Pen</div>
-                            </div>
-                            <div>
-                                <h1 class="text-lg font-bold text-gray-800 mb-1 uppercase tracking-wide">CÔNG TY CỔ PHẦN GOLDEN PEN</h1>
-                                <div class="text-xs space-y-1 text-gray-700">
-                                    <p><strong>Địa chỉ:</strong> Tầng 19, Tòa nhà Nam Cường, Hà Đông, Hà Nội</p>
-                                    <p><strong>Điện thoại:</strong> 024.3553.9266 / 024.3553.9268</p>
-                                    <p><strong>Website:</strong> www.goldenpen.com.vn</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-xs text-right italic text-gray-600">
-                            <p class="font-semibold text-gray-800">Mẫu số: 01-ĐH</p>
-                            <p>(Ban hành theo QĐ số...)</p>
-                        </div>
+                        <!-- Logo Golden Pen -->
+                        <img src="https://goldenpen.com.vn/wp-content/uploads/2021/04/logo-golden-pen.png" alt="Golden Pen" class="h-20 object-contain">
                     </div>
 
                     <!-- Title -->
@@ -178,9 +150,9 @@
                                 <tr>
                                     <td class="font-bold align-top py-1">Chiết khấu:</td>
                                     <td colspan="3" class="py-1">
-                                        ${orderData.CKTM ? `Thương mại: ${orderData.CKTM}%` : ''} 
+                                        ${orderData.CKTM ? `Thương mại: ${Number(orderData.CKTM) * 100}%` : ''} 
                                         ${orderData.CKTM && orderData.CKKM ? ' | ' : ''}
-                                        ${orderData.CKKM ? `Khuyến mại: ${orderData.CKKM}%` : ''}
+                                        ${orderData.CKKM ? `Khuyến mại: ${Number(orderData.CKKM) * 100}%` : ''}
                                     </td>
                                 </tr>
                             </tbody>
@@ -191,20 +163,20 @@
                     <table class="w-full border-collapse border border-gray-800 text-sm mb-4" style="table-layout: fixed; word-wrap: break-word;">
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 8%;">STT</th>
-                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 20%;">Mã vật tư</th>
-                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 42%;">Tên hàng</th>
-                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 10%;">%CK</th>
-                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 20%;">Số lượng</th>
+                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 6%;">STT</th>
+                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 14%;">Mã vật tư</th>
+                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 20%;">Barcode</th>
+                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 40%;">Tên hàng</th>
+                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 8%;">%CK</th>
+                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 12%;">Số lượng</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${itemsHtml}
                             <tr class="font-bold bg-gray-50" style="page-break-inside: avoid">
-                                <td colspan="4" class="border border-gray-800 p-2 text-right uppercase">Tổng cộng số lượng:</td>
+                                <td colspan="5" class="border border-gray-800 p-2 text-right uppercase">Tổng cộng số lượng:</td>
                                 <td class="border border-gray-800 p-2 text-right text-base">${formatCurrency(totalQuantity)}</td>
                             </tr>
-                            ${totalAmountHtml}
                         </tbody>
                     </table>
 
