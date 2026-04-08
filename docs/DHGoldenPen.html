@@ -7,7 +7,7 @@
     <!-- Tải Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Tải thư viện xuất PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://drive.google.com/file/d/1k3YGrOcCSRjUhtVE4aZQPDE-JMoy6Irq/view?usp=sharing"></script>
     <style>
         @media print {
             /* Set lề trang in bằng 0 để dùng padding của HTML */
@@ -163,11 +163,12 @@
                     <table class="w-full border-collapse border border-gray-800 text-sm mb-4" style="table-layout: fixed; word-wrap: break-word;">
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 6%;">STT</th>
+                                <!-- Đã thêm whitespace-nowrap để cấm rớt dòng và chỉnh lại % -->
+                                <th class="border border-gray-800 p-2 text-center font-bold whitespace-nowrap" style="width: 8%;">STT</th>
                                 <th class="border border-gray-800 p-2 text-center font-bold" style="width: 14%;">Mã vật tư</th>
                                 <th class="border border-gray-800 p-2 text-center font-bold" style="width: 20%;">Barcode</th>
-                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 40%;">Tên hàng</th>
-                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 8%;">%CK</th>
+                                <th class="border border-gray-800 p-2 text-center font-bold" style="width: 36%;">Tên hàng</th>
+                                <th class="border border-gray-800 p-2 text-center font-bold whitespace-nowrap" style="width: 10%;">%CK</th>
                                 <th class="border border-gray-800 p-2 text-center font-bold" style="width: 12%;">Số lượng</th>
                             </tr>
                         </thead>
