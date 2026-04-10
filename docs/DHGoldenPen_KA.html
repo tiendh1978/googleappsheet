@@ -176,10 +176,22 @@
             if (orderDataStr && orderDetailsStr) {
                 try {
                     const orderData = JSON.parse(decodeURIComponent(orderDataStr));
-                    const orderDetails = JSON.parse(decodeURIComponent(orderDetailsStr));
+                    
+                    // AppSheet's SELECT returns a comma-separated list of JSON strings.
+                    // We need to properly format it into a JSON array.
+                    let decodedDetails = decodeURIComponent(orderDetailsStr);
+                    
+                    // Xóa dấu ngoặc vuông ở 2 đầu (nếu có) do AppSheet có thể đã thêm vào
+                    decodedDetails = decodedDetails.replace(/^\[|\]$/g, '').trim();
+                    
+                    // Thay thế các dấu phẩy có khoảng trắng giữa các object
+                    decodedDetails = "[" + decodedDetails.replace(/}\s*,\s*{/g, "},{") + "]";
+                    
+                    const orderDetails = JSON.parse(decodedDetails);
                     renderInvoice(orderData, orderDetails);
                 } catch (e) {
-                    document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="text-center text-red-500">Lỗi dữ liệu.</td></tr>';
+                    console.error("Parse error:", e);
+                    document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="text-center text-red-500">Lỗi dữ liệu: ' + e.message + '</td></tr>';
                 }
             } else {
                 // Dữ liệu test dùng key ép cân
@@ -257,7 +269,7 @@
             html2pdf().set({
                 margin: 0, filename: 'PhieuXuatKho_NS_KA.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
+                html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             }).from(element).save();
         }
