@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phiếu Xuất Kho - Golden Pen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Times+New+Roman:wght@400;700&display=swap');
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            color: #000;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        #invoice-container {
+            width: 210mm;
+            min-height: 297mm;
+            background-color: white;
+            padding: 15mm;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 4px;
+            font-size: 13px;
+        }
+        th {
+            text-align: center;
+            font-weight: bold;
+        }
+        /* Chống cắt ngang dòng khi in sang trang 2 */
+        tr { page-break-inside: avoid; }
+        
+        @media print {
+            body { background-color: white; padding: 0; }
+            #invoice-container { box-shadow: none; width: 100%; padding: 0; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="fixed top-4 right-4 flex flex-col gap-2 no-print">
+        <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">🖨️ In Phiếu</button>
+        <button onclick="generatePDF()" class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700">📄 Tải PDF</button>
+    </div>
+
+    <div id="invoice-container">
+        <!-- Header -->
+        <div class="flex justify-between items-start mb-4">
+            <div class="flex gap-4">
+                <!-- Logo -->
+                <div class="w-64 h-auto flex-shrink-0 mr-4">
+                    <img src="https://raw.githubusercontent.com/tiendh1978/googleappsheet/main/docs/Goleden%20Pen%20Logo.jpg" alt="Golden Pen Logo" class="w-full h-auto object-contain">
+                </div>
+            </div>
+            <div class="text-[14px] text-right">
+                <p>STK: 0011004191710 - Vietcombank - Nguyen Xuan Hoa</p>
+                <p>STK: 102871733015 - Vietinbank - Nguyen Xuan Hoa</p>
+                <p>Chi nhánh: Mỹ Đình</p>
+            </div>
+        </div>
+
+        <!-- Title -->
+        <div class="text-center mb-6 relative">
+            <h1 class="text-2xl font-bold tracking-wider">PHIẾU XUẤT KHO</h1>
+            <p class="text-[14px] italic" id="ngayThangNam">Ngày ... Tháng ... Năm 20...</p>
+            <p class="text-[14px] absolute right-0 bottom-0" id="soDonHang">Số: </p>
+        </div>
+
+        <!-- Customer Info -->
+        <div class="text-[14px] mb-4 leading-relaxed">
+            <div class="grid grid-cols-12 gap-2">
+                <div class="col-span-2">Người nhận hàng:</div>
+                <div class="col-span-6 font-bold" id="tenKhachHang"></div>
+                <div class="col-span-2 text-right">Mã khách:</div>
+                <div class="col-span-2 font-bold" id="maKhachHang"></div>
+            </div>
+            <div class="grid grid-cols-12 gap-2">
+                <div class="col-span-2">Địa chỉ:</div>
+                <div class="col-span-6" id="diaChi"></div>
+                <div class="col-span-2 text-right">Điện thoại:</div>
+                <div class="col-span-2" id="dienThoai"></div>
+            </div>
+            <div class="grid grid-cols-12 gap-2">
+                <div class="col-span-2">Diễn giải:</div>
+                <div class="col-span-10" id="ghiChu"></div>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <table class="w-full mb-2">
+            <thead>
+                <tr>
+                    <th class="w-8">STT</th>
+                    <th>Tên hàng hóa</th>
+                    <th class="w-12">ĐVT</th>
+                    <th class="w-16">Số Lượng</th>
+                    <th class="w-20">Đơn giá</th>
+                    <th class="w-10">%CK</th>
+                    <th class="w-20">ĐG sau CK</th>
+                    <th class="w-10">%KM</th>
+                    <th class="w-24">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Data injected by JS -->
+            </tbody>
+        </table>
+
+        <!-- Summary Section -->
+        <div class="flex justify-end text-[14px] mb-6">
+            <div class="w-2/3">
+                <div class="flex justify-between font-bold mb-1">
+                    <span>Tổng cộng:</span>
+                    <span id="tongCong">0</span>
+                </div>
+                <div class="flex justify-between mb-1">
+                    <span>Khuyến mại (nếu có):</span>
+                    <span>= <span id="phanTramKM">0</span> %</span>
+                    <span id="tienKhuyenMai" class="font-bold">0</span>
+                </div>
+                <div class="flex justify-between font-bold mb-1">
+                    <span>Tổng tiền thanh toán (trong vòng 5 ngày), CKTT 2%:</span>
+                    <span id="thanhToan5Ngay">0</span>
+                </div>
+                <div class="flex justify-between font-bold">
+                    <span>Tổng tiền thanh toán (trong vòng 20 ngày), CKTT 1%:</span>
+                    <span id="thanhToan20Ngay">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signatures -->
+        <div class="grid grid-cols-5 text-center text-[14px] mt-8 page-break-inside-avoid">
+            <div>
+                <p class="italic mb-1">Nhận, Ngày ..... tháng ..... năm 20.....</p>
+                <p class="font-bold">Khách hàng</p>
+                <p class="italic text-xs">(Ký, ghi rõ họ tên)</p>
+            </div>
+            <div class="mt-5">
+                <p class="font-bold">Người giao hàng</p>
+                <p class="italic text-xs">(Ký, ghi rõ họ tên)</p>
+            </div>
+            <div class="mt-5">
+                <p class="font-bold">Thủ kho</p>
+                <p class="italic text-xs">(Ký, ghi rõ họ tên)</p>
+            </div>
+            <div class="mt-5">
+                <p class="font-bold">Kiểm soát hàng</p>
+                <p class="italic text-xs">(Ký, ghi rõ họ tên)</p>
+            </div>
+            <div>
+                <p class="italic mb-1">Xuất, Ngày ..... tháng ..... năm 20.....</p>
+                <p class="font-bold">Người nhận hàng</p>
+                <p class="italic text-xs">(Ký, ghi rõ họ tên)</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const formatMoney = (num) => Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const orderDataStr = params.get('orderData');
+            const orderDetailsStr = params.get('orderDetails');
+
+            if (orderDataStr && orderDetailsStr) {
+                try {
+                    const orderData = JSON.parse(decodeURIComponent(orderDataStr));
+                    const orderDetails = JSON.parse(decodeURIComponent(orderDetailsStr));
+                    renderInvoice(orderData, orderDetails);
+                } catch (e) {
+                    document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="text-center text-red-500">Lỗi dữ liệu.</td></tr>';
+                }
+            } else {
+                // Dữ liệu test dùng key ép cân
+                const mockOrder = { mdh: "N26-04-169", ng: "04/10/2026", tkh: "KA/MB/HPG/KA_Cty TNHH MTV TBVP Thanh Ngọc", mkh: "HN6000", dc: "Số 9 Phạm Hồng Thái, Hải Phòng", dt: "0913244384", gc: "Giao giờ hành chính", km: 0 };
+                const mockDetails = [
+                    { t: "BL77-CO Bút ký mực gel", d: "Cái", s: 12, g: 38340, c: 6, k: 0 },
+                    { t: "LR7-CX Ruột bút ký", d: "Cái", s: 24, g: 0, c: 0, k: 0 },
+                    { t: "BL57-CO Bút ký mực gel nét 0.7mm", d: "Cái", s: 576, g: 18792, c: 6, k: 0 }
+                ];
+                renderInvoice(mockOrder, mockDetails);
+            }
+        }
+
+        function renderInvoice(order, details) {
+            // Map dữ liệu Order ép cân (mdh, ng, tkh...)
+            if(order.ng) {
+                const parts = order.ng.split('/');
+                if(parts.length === 3) document.getElementById('ngayThangNam').innerText = `Ngày ${parts[0]} Tháng ${parts[1]} Năm ${parts[2]}`;
+            }
+            document.getElementById('soDonHang').innerText = `Số: ${order.mdh || ''}`;
+            document.getElementById('tenKhachHang').innerText = order.tkh || '';
+            document.getElementById('maKhachHang').innerText = order.mkh || '';
+            document.getElementById('diaChi').innerText = order.dc || '';
+            document.getElementById('dienThoai').innerText = order.dt || '';
+            document.getElementById('ghiChu').innerText = order.gc || '';
+
+            const tbody = document.getElementById('tableBody');
+            let html = '';
+            let tongCong = 0;
+
+            // Map dữ liệu Details ép cân (t, d, s, g, c, k)
+            details.forEach((item, index) => {
+                const sl = parseFloat(item.s) || 0;
+                const gia = parseFloat(item.g) || 0;
+                const ck = parseFloat(item.c) || 0; 
+                const km = parseFloat(item.k) || 0; 
+
+                const dgSauCK = gia * (1 - ck / 100);
+                const thanhTien = sl * dgSauCK * (1 - km / 100);
+                tongCong += thanhTien;
+
+                html += `
+                    <tr>
+                        <td class="text-center">${index + 1}</td>
+                        <td>${item.t || ''}</td>
+                        <td class="text-center">${item.d || ''}</td>
+                        <td class="text-center">${formatMoney(sl)}</td>
+                        <td class="text-right">${formatMoney(gia)}</td>
+                        <td class="text-center">${ck}</td>
+                        <td class="text-right">${formatMoney(dgSauCK)}</td>
+                        <td class="text-center">${km}</td>
+                        <td class="text-right">${formatMoney(thanhTien)}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+
+            // Tính toán tổng
+            const phanTramKM_Tong = parseFloat(order.km) || 0;
+            const tienKhuyenMai = tongCong * (phanTramKM_Tong / 100);
+            const tienSauKM = tongCong - tienKhuyenMai;
+            
+            const thanhToan5Ngay = tienSauKM * 0.98; // Trừ 2%
+            const thanhToan20Ngay = tienSauKM * 0.99; // Trừ 1%
+
+            document.getElementById('tongCong').innerText = formatMoney(tongCong);
+            document.getElementById('phanTramKM').innerText = phanTramKM_Tong;
+            document.getElementById('tienKhuyenMai').innerText = formatMoney(tienKhuyenMai);
+            document.getElementById('thanhToan5Ngay').innerText = formatMoney(thanhToan5Ngay);
+            document.getElementById('thanhToan20Ngay').innerText = formatMoney(thanhToan20Ngay);
+        }
+
+        function generatePDF() {
+            const element = document.getElementById('invoice-container');
+            html2pdf().set({
+                margin: 0, filename: 'PhieuXuatKho_NS_KA.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).from(element).save();
+        }
+
+        window.onload = getUrlParams;
+    </script>
+</body>
+</html>
