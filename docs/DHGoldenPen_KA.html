@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -44,7 +45,7 @@
             .no-print { display: none; }
         }
     </style>
-</head>
+<script src="/_aistudio-iframe.js"></script></head>
 <body>
 
     <div class="fixed top-4 right-4 flex flex-col gap-2 no-print">
@@ -178,14 +179,15 @@
                     const orderData = JSON.parse(decodeURIComponent(orderDataStr));
                     
                     // AppSheet's SELECT returns a comma-separated list of JSON strings.
-                    // We need to properly format it into a JSON array.
+                    // We need to properly format it into a JSON array if it's not already one.
                     let decodedDetails = decodeURIComponent(orderDetailsStr);
                     
-                    // Xóa dấu ngoặc vuông ở 2 đầu (nếu có) do AppSheet có thể đã thêm vào
-                    decodedDetails = decodedDetails.replace(/^\[|\]$/g, '').trim();
-                    
-                    // Thay thế các dấu phẩy có khoảng trắng giữa các object
-                    decodedDetails = "[" + decodedDetails.replace(/}\s*,\s*{/g, "},{") + "]";
+                    // If it starts with [ and ends with ], it's already an array (our new format)
+                    // If not, it's the raw SELECT output that needs to be wrapped
+                    if (!decodedDetails.trim().startsWith('[')) {
+                        // Replace " , " with "," to fix AppSheet's list separator
+                        decodedDetails = "[" + decodedDetails.replace(/} , {/g, "},{") + "]";
+                    }
                     
                     const orderDetails = JSON.parse(decodedDetails);
                     renderInvoice(orderData, orderDetails);
