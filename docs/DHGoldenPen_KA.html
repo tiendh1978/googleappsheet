@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -45,7 +44,7 @@
             .no-print { display: none; }
         }
     </style>
-<script src="/_aistudio-iframe.js"></script></head>
+</head>
 <body>
 
     <div class="fixed top-4 right-4 flex flex-col gap-2 no-print">
@@ -176,18 +175,28 @@
 
             if (orderDataStr && orderDetailsStr) {
                 try {
-                    const orderData = JSON.parse(decodeURIComponent(orderDataStr));
+                    let decodedOrderData = orderDataStr;
+                    // Xóa các ký tự điều khiển (newline, tab) có thể gây lỗi parse JSON
+                    decodedOrderData = decodedOrderData.replace(/[\n\r\t]/g, ' ');
+                    const orderData = JSON.parse(decodedOrderData);
                     
                     // AppSheet's SELECT returns a comma-separated list of JSON strings.
-                    // We need to properly format it into a JSON array if it's not already one.
-                    let decodedDetails = decodeURIComponent(orderDetailsStr);
+                    // We need to properly format it into a JSON array.
+                    let decodedDetails = orderDetailsStr;
                     
-                    // If it starts with [ and ends with ], it's already an array (our new format)
-                    // If not, it's the raw SELECT output that needs to be wrapped
-                    if (!decodedDetails.trim().startsWith('[')) {
-                        // Replace " , " with "," to fix AppSheet's list separator
-                        decodedDetails = "[" + decodedDetails.replace(/} , {/g, "},{") + "]";
-                    }
+                    // Xóa các ký tự điều khiển (newline, tab) có thể gây lỗi parse JSON
+                    decodedDetails = decodedDetails.replace(/[\n\r\t]/g, ' ');
+                    
+                    // Xóa dấu ngoặc vuông ở 2 đầu (nếu có) do AppSheet có thể đã thêm vào
+                    decodedDetails = decodedDetails.replace(/^\[|\]$/g, '').trim();
+                    
+                    // Thay thế các dấu phẩy có khoảng trắng giữa các object
+                    decodedDetails = "[" + decodedDetails.replace(/}\s*,\s*{/g, "},{") + "]";
+                    
+                    // SỬA LỖI JSON TỪ APPSHEET: 
+                    // Nếu AppSheet trả về giá trị rỗng cho số (ví dụ: "k":}), nó sẽ gây lỗi JSON.
+                    // Regex này sẽ tìm các key bị thiếu value và điền 'null' vào (ví dụ: "k":} -> "k":null})
+                    decodedDetails = decodedDetails.replace(/:\s*(?=[,}])/g, ':null');
                     
                     const orderDetails = JSON.parse(decodedDetails);
                     renderInvoice(orderData, orderDetails);
